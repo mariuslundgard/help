@@ -1,4 +1,4 @@
-<?ph
+<?php
 
 /**
  * Dumps any object to a readable string
