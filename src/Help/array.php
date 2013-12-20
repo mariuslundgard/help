@@ -82,31 +82,35 @@ function array_dot_set(array &$array, $path, $value)
  *
  * @return [type]        [description]
  */
-function array_dot_get(array $array, $path)
+function array_dot_get(array $subject, $path)
 {
     $keys = explode(".", $path);
 
-    while ((1 < count($keys))
-        && ($key = array_shift($keys))) {
+    while ((1 < count($keys)) && ($key = array_shift($keys))) {
 
-        if ((isset($array[$key])) && (is_array($array[$key]))) {
-            $array = &$array[$key];
+        if ((isset($subject[$key])) && (is_array($subject[$key]))) {
+            $subject = &$subject[$key];
         }
 
         // echo $key;
         // exit;
-        if ((isset($array[$key])) && (is_object($array[$key]))) {
-
-            echo "obj";
-            exit;
-            // $array = &$array[$key];
+        if ((isset($subject[$key])) && (is_object($subject[$key]))) {
+            $subject = $subject[$key];
+            // echo "obj";
+            // exit;
+            // $subject = &$subject[$key];
         }
     }
 
     $key = array_shift($keys);
 
-    return (isset($array[$key]))
-        ? $array[$key]
+    if (is_object($subject)) {
+        $value = $subject->$key;
+        return $value;
+    }
+
+    return (isset($subject[$key]))
+        ? $subject[$key]
         : null;
 }
 
