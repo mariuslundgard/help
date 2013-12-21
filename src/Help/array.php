@@ -1,5 +1,29 @@
 <?php
 
+function array_insert($target, $index, $replacement)
+{
+    $result = [];
+
+    foreach ($target as $key => $value) {
+
+        if ($index === $key) {
+            $result[] = $replacement;
+        }
+
+        $result[] = $value;
+
+    }
+
+    return $result;
+
+  // $value = end($array);
+
+  // reset($array);
+
+  // return $value;
+}
+
+
 /**
  * Returns the last item of an array without modifying the array
  *
