@@ -17,10 +17,10 @@
     },
     "autoload": {
         "files": [
-            "src/Help/array.php",
-            "src/Help/object.php",
-            "src/Help/string.php",
-            "src/Help/time.php"
+            "src/array.php",
+            "src/object.php",
+            "src/string.php",
+            "src/time.php"
         ],
         "psr-0": {
             "Help": "src/"
