@@ -155,6 +155,106 @@ function array_dot_get(array $subject, $path)
         : null;
 }
 
+
+function array_dot_isset(array $subject, $path)
+{
+    $keys = explode(".", $path);
+
+    while ((1 < count($keys)) && ($key = array_shift($keys))) {
+
+        if (is_array($subject)) {
+            if ((isset($subject[$key])) && (is_array($subject[$key]))) {
+                $subject = &$subject[$key];
+            }
+
+            // echo $key;
+            // exit;
+            if ((isset($subject[$key])) && (is_object($subject[$key]))) {
+                $subject = $subject[$key];
+                // echo "obj";
+                // exit;
+                // $subject = &$subject[$key];
+            }
+        }
+
+        elseif (is_object($subject)) {
+            if ((isset($subject->$key)) && (is_array($subject->$key))) {
+                $subject = &$subject->$key;
+            }
+
+            // echo $key;
+            // exit;
+            if ((isset($subject->$key)) && (is_object($subject->$key))) {
+                $subject = $subject[$key];
+                // echo "obj";
+                // exit;
+                // $subject = &$subject[$key];
+            }
+        }
+    }
+
+    $key = array_shift($keys);
+
+    if (is_object($subject)) {
+        $value = $subject->$key;
+        return $value;
+    }
+
+    return (isset($subject[$key]))
+        ? true
+        : false;
+}
+
+function array_dot_unset(array &$subject, $path)
+{
+    $keys = explode(".", $path);
+
+    while ((1 < count($keys)) && ($key = array_shift($keys))) {
+
+        if (is_array($subject)) {
+            if ((isset($subject[$key])) && (is_array($subject[$key]))) {
+                $subject = &$subject[$key];
+            }
+
+            // echo $key;
+            // exit;
+            if ((isset($subject[$key])) && (is_object($subject[$key]))) {
+                $subject = $subject[$key];
+                // echo "obj";
+                // exit;
+                // $subject = &$subject[$key];
+            }
+        }
+
+        elseif (is_object($subject)) {
+            if ((isset($subject->$key)) && (is_array($subject->$key))) {
+                $subject = &$subject->$key;
+            }
+
+            // echo $key;
+            // exit;
+            if ((isset($subject->$key)) && (is_object($subject->$key))) {
+                $subject = $subject[$key];
+                // echo "obj";
+                // exit;
+                // $subject = &$subject[$key];
+            }
+        }
+    }
+
+    $key = array_shift($keys);
+
+    if (is_object($subject)) {
+        unset($subject->$key);
+        return;
+    }
+
+    if (isset($subject[$key])) {
+        unset($subject[$key]);
+        return;
+    }
+}
+
 /**
  * Merges two arrays containing dot-separated paths
  *

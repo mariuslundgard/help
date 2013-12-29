@@ -23,7 +23,7 @@
             "src/Help/time.php"
         ],
         "psr-0": {
-            "Illuminate": "src/"
+            "Help": "src/"
         }
     },
     "minimum-stability": "dev"
