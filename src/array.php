@@ -104,7 +104,7 @@ function array_dot_set(array &$array, $path, $value)
  *
  * @return [type]        [description]
  */
-function array_dot_get(array $subject, $path)
+function array_dot_get($subject, $path)
 {
     $keys = explode(".", $path);
 

@@ -6,14 +6,14 @@ class PathArray implements \ArrayAccess
 {
     protected $data;
 
-    public function __construct(array $data)
+    public function __construct(array $data = [])
     {
         $this->data = [];
 
         $this->merge($data);
     }
 
-    public function get($property, $default = null)
+    public function get($property = null, $default = null)
     {
         if ($property) {
             $result = array_dot_get($this->data, $property);
@@ -63,4 +63,14 @@ class PathArray implements \ArrayAccess
     {
         return array_dot_unset($this->data, $path);
     }
+
+    // public function __toString()
+    // {
+    //     return 'patharray';
+    // }
+
+    // public function __sleep()
+    // {
+    //     return ['sleep' => true];
+    // }
 }
