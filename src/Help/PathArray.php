@@ -39,9 +39,10 @@ class PathArray implements \ArrayAccess
 
     public function merge(array $data)
     {
-        foreach ($data as $key => $value) {
-            $this->set($key, $value);
-        }
+        $this->data = array_dot_merge($this->data, $data);
+        // foreach ($data as $key => $value) {
+        //     $this->set($key, $value);
+        // }
     }
 
     public function offsetExists($path)

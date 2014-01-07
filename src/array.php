@@ -263,11 +263,94 @@ function array_dot_unset(array &$subject, $path)
  *
  * @return [type]         [description]
  */
-function array_dot_merge(array &$target, array $source)
+function array_dot_merge(array $target, array $source, $overwrite = true)
 {
-    foreach ($source as $path => $value) {
-        array_dot_set($target, $path, $value);
+    $target = array_dot_expand($target);
+    $expanded = array_dot_expand($source);
+
+    foreach ($expanded as $key => $value) {
+        if (is_numeric($key)) {
+            array_push($target, $value);
+        } else {
+        
+            if (is_array($value)) {
+                if (isset($target[$key])) {
+                    if (is_array($target[$key])) {
+                        $target[$key] = array_dot_merge($target[$key], $value);
+                    } else {
+                        $target[$key] = $value;
+                    }
+                    
+                } else {
+                    $target[$key] = $value;
+                }
+            } else {
+                $target[$key] = $value;
+            }
+        }
     }
+
+    return $target;
+}
+
+function array_dot_expand($array, $overwrite = true)
+{
+    $result = [];
+
+    foreach ($array as $path => $value) {
+        if (is_numeric($path)) {
+            array_push($result, $value);
+        } else {
+            $pathParts = explode('.', $path);
+            $key = array_shift($pathParts);
+
+            if (count($pathParts)) {
+                if (isset($result[$key])) {
+                    if (is_array($result[$key])) {
+
+                        // $result[$key] = array_dot_merge(
+                        //     $result[$key], 
+                        //     array_dot_expand([implode('.', $pathParts) => $value])
+                        // );
+                        $a1 = $result[$key];
+                        // echo $key;
+                        $a2 = array_dot_expand([implode('.', $pathParts) => $value]);
+
+                        $result[$key] = array_dot_merge($a1, $a2);
+                        // // d($value);
+                        // // d(array_dot_expand([implode('.', $pathParts) => $value]));
+                        // exit;
+
+                        // // TODO: use array_dot_merge here
+                        // $result[$key] = array_merge(
+                        //     $result[$key], 
+                        //     array_dot_expand([implode('.', $pathParts) => $value])
+                        // );
+                    } else {
+                        if ($overwrite) {
+                            $result[$key] = $value;
+                        } else {
+                            throw new Exception('Could not overwrite: '. $key);
+                        }
+                    }
+                } else {
+                    $result[$key] = array_dot_expand([implode('.', $pathParts) => $value]);
+                }
+            } else {
+                if (isset($result[$key])) {
+                    if (is_array($result[$key])) {
+                        $result[$key] = array_merge($result[$key], array_dot_expand($value));
+                    } else {
+                        throw new Exception('Could not overwrite: '. $key);
+                    }
+                } else {
+                    $result[$key] = $value;
+                }
+            }
+        }
+    }
+
+    return $result;
 }
 
 /**
