@@ -373,9 +373,9 @@ function is_assoc_array(array $array)
  *
  * @return Boolean Returns TRUE on success or FALSE on failure.
  */
-function sort_by_property(array &$array, $propertyKey)
+function sort_by_property(array &$array, $propertyKey, $ascending = true, $caseInsensitive = false)
 {
-    return usort($array, function($a, $b) use ($propertyKey)
+    return usort($array, function($a, $b) use ($propertyKey, $ascending, $caseInsensitive)
     {
         // Check if object `a` is an object or array
         if (is_object($a)) {
@@ -395,10 +395,19 @@ function sort_by_property(array &$array, $propertyKey)
             throw new \RuntimeException('Expected either an object or an array for sorting');
         }
 
+        if ($caseInsensitive) {
+            $aValue = strtolower($aValue);
+            $bValue = strtolower($bValue);
+        }
+
         if ($aValue === $bValue) {
             return 0;
         }
 
-        return ($aValue < $bValue) ? -1 : 1;
+        if ($ascending) {
+            return ($aValue < $bValue) ? -1 : 1;
+        }
+
+        return ($aValue > $bValue) ? -1 : 1;
     });
 }

@@ -67,7 +67,7 @@ function str_nonce($str)
  *
  * @return [type]        [description]
  */
-function strRandom($bits = 256)
+function str_random($bits = 256)
 {
     $bytes = ceil($bits / 8);
 
@@ -89,9 +89,9 @@ function strRandom($bits = 256)
  *
  * @return [type]         [description]
  */
-function strUriNormalize($str, $lower = true, $glue = "-")
+function str_url_normalize($str, $lower = true, $glue = "-")
 {
-    $str = strNormalize($str);
+    $str = str_normalize($str);
     $str = preg_replace("~[^\\pL\d]+~u", $glue, $str);
     $str = trim($str, $glue);
 
@@ -105,9 +105,9 @@ function strUriNormalize($str, $lower = true, $glue = "-")
  *
  * @return [type]      [description]
  */
-function strNormalize($str)
+function str_normalize($str)
 {
-    $str = strUtf8($str);
+    $str = str_utf8($str);
 
     $chars = array(
         'Š'=>'S', 'š'=>'s', 'Đ'=>'Dj', 'đ'=>'dj', 'Ž'=>'Z', 'ž'=>'z', 'Č'=>'C', 'č'=>'c', 'Ć'=>'C', 'ć'=>'c',
@@ -132,16 +132,16 @@ function strNormalize($str)
  *
  * @return [type]      [description]
  */
-function strUtf8($str)
+function str_utf8($str)
 {
-    $str = strEncode($str);
+    $str = str_encode($str);
 
     $entities = array(
         "&#778;" => "å",
         "&#8217" => "",
     );
 
-    $str = strDecode(strtr($str, $entities));
+    $str = str_decode(strtr($str, $entities));
 
     return $str;
 }
@@ -153,11 +153,11 @@ function strUtf8($str)
  *
  * @return [type]      [description]
  */
-function strEncode($str)
+function str_encode($str)
 {
     $str = mb_convert_encoding($str, 'UTF-32', 'UTF-8');
     $t = unpack("N*", $str);
-    $t = array_map("prependAmpersandAndPound", $t);
+    $t = array_map("str_prepend_ampersand_and_pound", $t);
     return implode("", $t);
 }
 
@@ -168,7 +168,7 @@ function strEncode($str)
  *
  * @return [type]      [description]
  */
-function strDecode($str)
+function str_decode($str)
 {
     $str = html_entity_decode($str);
 
@@ -182,7 +182,7 @@ function strDecode($str)
  *
  * @return [type]    [description]
  */
-function prependAmpersandAndPound($n)
+function str_prepend_ampersand_and_pound($n)
 {
     return "&#$n;";
 }
@@ -194,13 +194,12 @@ function prependAmpersandAndPound($n)
  *
  * @return string Indented version of the original JSON string.
  */
-function jsonFormat($json)
+function str_json_format($json)
 {
-
     $result      = "";
     $pos         = 0;
     $strLen      = strlen($json);
-    $indentStr   = "\t";
+    $indentStr   = "  ";
     $newLine     = "\n";
     $prevChar    = "";
     $outOfQuotes = true;
@@ -230,6 +229,11 @@ function jsonFormat($json)
         // If the last character was the beginning of an element,
         // output a new line and indent the next line.
         if (($char == ',' || $char == '{' || $char == '[') && $outOfQuotes) {
+            if ($pos) {
+                $result = substr($result, 0, strlen($result)-1).' '.'{';
+            }
+            // echo $result;
+            // exit;
             $result .= $newLine;
             if ($char == '{' || $char == '[') {
                 $pos ++;
@@ -277,7 +281,7 @@ $_colors = array(
  *
  * @return [type]         [description]
  */
-function termColored($text, $color="NORMAL", $back=1)
+function str_term_colored($text, $color="NORMAL", $back=1)
 {
     global $_colors;
     $out = $_colors["$color"];
@@ -304,7 +308,7 @@ function termColored($text, $color="NORMAL", $back=1)
  *       shamelessly stolen from Feyd (which is in public domain).
  *
  */
-function utf8chr($code)
+function str_utf8_chr($code)
 {
     if (($code > 0x10FFFF || $code < 0x0 )
      || ($code >= 0xD800 && $code <= 0xDFFF)) {
@@ -341,4 +345,70 @@ function utf8chr($code)
     $ret .= chr($x);
 
     return $ret;
+}
+
+// Debugging values
+function d()
+{
+    $r = [];
+
+    foreach (func_get_args() as $arg) {
+        $str = print_r($arg, true);
+        $color = null;
+
+        if (is_numeric($arg) && $arg !== true) {
+            $color = '#00f';
+        } else if (is_string($arg)) {
+            $color = '#f00';
+        } else if (is_object($arg) || is_array($arg)) {
+            $color = '#333';
+        }
+
+        if (true === $arg) {
+            $r[] = 'TRUE';
+        } elseif (false === $arg) {
+            $r[] = 'FALSE';
+        } else {
+            if ($str) {
+                $str = str_replace("\n *RECURSION*", " [R]", $str);
+                $str = str_replace('    [', '    "', $str);
+                $str = str_replace("] => \n", "] => NULL\n", $str);
+                $str = str_replace(':protected] => ', '] => ', $str);
+                $str = str_replace('] => ', '": ', $str);
+                $str = str_replace('    (', '    {', $str);
+                $str = str_replace('    )', '    }', $str);
+                $str = str_replace("\n(", "\n{", $str);
+                $str = str_replace("\n)", "\n}", $str);
+                $str = str_replace('    ', '  ', $str);
+                
+                if ($color) {
+                    $str = '<span style="color: '.$color.';">'.$str.'</span>';
+                }
+                // $r[] = str_wrap($str, 160);
+                $r[] = $str;
+            } else {
+                $r[] = '<span style="color: #999;">NULL';
+            }
+        }
+    }
+
+    $output = '<pre style="font-family: menlo; font-size: 13px; line-height: 1.5; background: #eee; margin: 0 0 .25em 0; padding: 1em;">';
+    $output .= implode("\n", $r);
+    $output .= '</pre>';
+
+    echo $output;
+}
+
+// Wrapping string
+function str_wrap($str, $width)
+{
+    $r = [];
+    $lines = explode("\n", $str);
+    for ($i=0; $i<count($lines); $i++) {
+        $numFolds = ceil(strlen($lines[$i])/$width);
+        for ($j=0; $j<$numFolds; $j++) {
+            $r[] = substr($lines[$i], $j*$width, $width);
+        }
+    }
+    return implode("\n", $r);
 }

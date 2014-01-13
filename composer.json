@@ -1,7 +1,7 @@
 {
     "name": "mariuslundgard/help",
     "description": "PHP helper library.",
-    "keywords": ["helpers", "string", "array"],
+    "keywords": ["helpers", "php"],
     "license": "MIT",
     "authors": [
         {
