@@ -350,7 +350,7 @@ function str_utf8_chr($code)
 // Debugging values
 function d()
 {
-    $r = [];
+    $buf = [];
 
     foreach (func_get_args() as $arg) {
         $str = print_r($arg, true);
@@ -365,9 +365,9 @@ function d()
         }
 
         if (true === $arg) {
-            $r[] = 'TRUE';
+            $buf[] = 'TRUE';
         } elseif (false === $arg) {
-            $r[] = 'FALSE';
+            $buf[] = 'FALSE';
         } else {
             if ($str) {
                 $str = str_replace("\n *RECURSION*", " [R]", $str);
@@ -384,16 +384,18 @@ function d()
                 if ($color) {
                     $str = '<span style="color: '.$color.';">'.$str.'</span>';
                 }
-                // $r[] = str_wrap($str, 160);
-                $r[] = $str;
+                // $buf[] = str_wrap($str, 160);
+                $buf[] = $str;
+            } elseif ('0' === $str || 0 === $str) {
+                $buf[] = '<span style="color: #00f;">0</span>';
             } else {
-                $r[] = '<span style="color: #999;">NULL';
+                $buf[] = '<span style="color: #999;">NULL</span>';
             }
         }
     }
 
     $output = '<pre style="font-family: menlo; font-size: 13px; line-height: 1.5; background: #eee; margin: 0 0 .25em 0; padding: 1em;">';
-    $output .= implode("\n", $r);
+    $output .= implode("\n", $buf);
     $output .= '</pre>';
 
     echo $output;
