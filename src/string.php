@@ -414,3 +414,18 @@ function str_wrap($str, $width)
     }
     return implode("\n", $r);
 }
+
+function str_contains($str, $substr)
+{
+    if (is_array($substr)) {
+        for ($i = 0; $i < count($substr); $i++) {
+            if (str_contains($str, $substr[$i])) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    return -1 < strpos($str, $substr);
+}
