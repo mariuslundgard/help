@@ -310,20 +310,25 @@ function str_term_colored($text, $color="NORMAL", $back=1)
  */
 function str_utf8_chr($code)
 {
-    if (($code > 0x10FFFF || $code < 0x0 )
-     || ($code >= 0xD800 && $code <= 0xDFFF)) {
+    if (($code > 0x10FFFF || $code < 0x0 ) || ($code >= 0xD800 && $code <= 0xDFFF)) {
+        
         // bits are set outside the "valid" range as defined
         // by UNICODE 4.1.0
         return "\xEF\xBF\xBD";
     }
 
     $x = $y = $z = $w = 0;
+
     if ($code < 0x80) {
+
         // regular ASCII character
         $x = $code;
+
     } else {
+        
         // set up bits for UTF-8
         $x = ($code & 0x3F) | 0x80;
+        
         if ($code < 0x800) {
             $y = (($code & 0x7FF) >> 6) | 0xC0;
         } else {
@@ -337,11 +342,22 @@ function str_utf8_chr($code)
             }
         }
     }
-    // set up the actual character
+
+    // get the actual character
     $ret = '';
-    if($w) $ret .= chr($w);
-    if($z) $ret .= chr($z);
-    if($y) $ret .= chr($y);
+    
+    if ($w) {
+        $ret .= chr($w);
+    }
+
+    if ($z) {
+        $ret .= chr($z);
+    }
+
+    if ($y) {
+        $ret .= chr($y);
+    }
+    
     $ret .= chr($x);
 
     return $ret;
@@ -350,15 +366,18 @@ function str_utf8_chr($code)
 // Wrapping string
 function str_wrap($str, $width)
 {
-    $r = [];
+    $ret = [];
     $lines = explode("\n", $str);
-    for ($i=0; $i<count($lines); $i++) {
-        $numFolds = ceil(strlen($lines[$i])/$width);
-        for ($j=0; $j<$numFolds; $j++) {
-            $r[] = substr($lines[$i], $j*$width, $width);
+
+    for ($i = 0; $i < count($lines); $i++) {
+        $numFolds = ceil(strlen($lines[$i]) / $width);
+
+        for ($ii = 0; $ii < $numFolds; $ii++) {
+            $ret[] = substr($lines[$i], $ii * $width, $width);
         }
     }
-    return implode("\n", $r);
+
+    return implode("\n", $ret);
 }
 
 function str_contains($str, $substr)
@@ -374,4 +393,20 @@ function str_contains($str, $substr)
     }
 
     return -1 < strpos($str, $substr);
+}
+
+function str_trim_split($str, $delim)
+{
+    return str_func_split($str, $delim, 'trim');
+}
+
+function str_func_split($str, $delim, $func)
+{
+    $ret = explode($delim, $str);
+
+    for ($i = 0; $i < count($ret); $i++) {
+        $ret[$i] = call_user_func_array($func, [$ret[$i]]);
+    }
+
+    return $ret;
 }
