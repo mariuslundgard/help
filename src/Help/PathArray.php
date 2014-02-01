@@ -26,6 +26,28 @@ class PathArray implements \ArrayAccess
         return $this->data;
     }
 
+    // public function getIndex($path) {
+    //     $parts = explode('.', $path);
+
+    //     if (1 < count($parts)) {
+    //         $name = array_pop($parts);
+    //         $parentPath = implode('.', $parts);
+    //         $container = $this->get($parentPath);
+    //         // d($container);
+    //     } else {
+    //         $name = $path;
+    //         $container = $this->data;
+    //     }
+
+    //     foreach ($container as $index => $value) {
+    //         if ($index === $name) {
+    //             return $index;
+    //         }
+    //     }
+
+    //     return null;
+    // }
+
     public function set($key, $value = null)
     {
         if (is_array($key) && !$value) {
@@ -33,16 +55,20 @@ class PathArray implements \ArrayAccess
                 $this->set($k, $v);
             }
         } else {
-            array_dot_set($this->data, $key, $value);
+            array_dot_set($this->data, $key, $value, true);
         }
     }
 
     public function merge(array $data)
     {
         $this->data = array_dot_merge($this->data, $data);
-        // foreach ($data as $key => $value) {
-        //     $this->set($key, $value);
-        // }
+    }
+
+    public function setBeforePath($beforePath, $path, $value)
+    {
+        $this->data = array_dot_insert_before_path($this->data, $beforePath, $path, $value);
+
+        return $this->data;
     }
 
     public function offsetExists($path)
@@ -57,7 +83,7 @@ class PathArray implements \ArrayAccess
 
     public function offsetSet($path, $value)
     {
-        return array_dot_set($this->data, $path, $value);
+        return array_dot_set($this->data, $path, $value, true);
     }
 
     public function offsetUnset($path)
