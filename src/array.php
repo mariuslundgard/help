@@ -29,7 +29,28 @@ function array_insert_at_index($target, $index, $insertedValue)
  *
  * @return mixed
  */
-function array_peek($array)
+function array_first(array $array)
+{
+    if (count($array)) {
+        return array_shift(array_slice($array, 0, 1));
+    }
+
+    return null;
+  // $value = end($array);
+
+  // reset($array);
+
+  // return $value;
+}
+
+/**
+ * Returns the last item of an array without modifying the array
+ *
+ * @param array &$array The array to search
+ *
+ * @return mixed
+ */
+function array_peek(array $array)
 {
   $value = end($array);
 
@@ -66,33 +87,35 @@ function implode_recursive($glue, $array)
  *
  * @return void
  */
-function array_dot_set(array &$array, $path, $value)
+function array_dot_set(array &$subject, $path, $value, $overwrite = false)
 {
-    $keys = is_numeric($path) ? array($path) : explode(".", $path);
+    $keys = is_numeric($path) ? [$path] : explode('.', $path);
 
-    while ((1 < count($keys))
-        && ($key = array_shift($keys))) {
-
-        if (! isset($array[$key])) {
-            $array[$key] = [];
-        } elseif (! is_array($array[$key])) {
-            $array[$key] = (array) $array[$key];
+    while (1 < count($keys) && $key = array_shift($keys)) {
+        if (!isset($subject[$key])) {
+            $subject[$key] = [];
+        } elseif (!is_array($subject[$key])) {
+            $subject[$key] = (array) $subject[$key];
         }
-        $array = &$array[$key];
+
+        $subject = &$subject[$key];
     }
 
     $key = array_shift($keys);
 
-    if (is_array($value)) {
+    // d($key);
+    // d($value);
 
-        if ((!isset($array[$key]))
-         || (!is_array($array[$key]))) {
-            $array[$key] = [];
+    if (!$overwrite && is_array($value)) { // merge
+        if (!isset($subject[$key]) || !is_array($subject[$key])) {
+            $subject[$key] = [];
         }
 
-        array_dot_merge($array[$key], $value);
-    } else {
-        $array[$key] = $value;
+        array_dot_merge($subject[$key], $value);
+    } else { // overwrite
+        // d($key);
+        // d($subject);
+        $subject[$key] = $value;
     }
 }
 
@@ -351,6 +374,42 @@ function array_dot_expand($array, $overwrite = true)
     }
 
     return $result;
+}
+
+function array_dot_insert_before_path(array $subject, $beforePath, $path, $value)
+{
+    $parts = explode('.', $beforePath);
+    $parentPath = null;
+    $container = $subject;
+
+    if (1 < count($parts)) {
+        $beforeKey = array_pop($parts);
+        $parentPath = implode('.', $parts);
+        $container = array_dot_get($subject, $parentPath);
+    } else {
+        $beforeKey = $beforePath;
+    }
+
+    if (is_array($container)) {
+        $newContainer = [];
+
+        foreach ($container as $k => $v) {
+            if ($beforeKey === $k) {
+                array_dot_set($newContainer, $path, $value);
+            }
+
+            $newContainer[$k] = $v;
+        }
+    }
+
+    // replace container
+    if ($parentPath) {
+        array_dot_set($subject, $parentPath, $newContainer, true);
+    } else {
+        $subject = $newContainer;
+    }
+
+    return $subject;
 }
 
 /**
