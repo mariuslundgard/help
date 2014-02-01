@@ -1,5 +1,110 @@
 <?php
 
+function inspect($obj, $depth = null, $mem = [])
+{
+    $mem += [ 'objects' => [] ];
+
+    if (0 === $depth) {
+        return;
+        // return '<div>' . $name . ' = [nesting stopped]</div>';
+    }
+
+    $depth--;
+
+    $type = null;
+    $info = [
+        'type' => null,
+        'isClass' => false,
+    ];
+
+    if (is_object($obj)) {
+
+        //
+        $info = [
+            'type' => 'object',
+            'name' => null,
+            'methods' => null,
+            'isClass' => false,
+            'recursion' => false,
+        ] + $info;
+
+        // prevent recursion
+        foreach ($mem['objects'] as $o) {
+            if (spl_object_hash($o) === spl_object_hash($obj)) {
+                $info['recursion'] = true;
+                // return;
+            }
+        }
+        $mem['objects'][] = $obj;
+
+        //
+        if (get_class($obj)) {
+            $refl = new ReflectionClass($obj);
+
+            $info['name'] = $refl->getName();
+            $info['isClass'] = true;
+
+            if (!$info['recursion']) {
+
+                if ($constants = $refl->getConstants()) {
+                    $info['constants'] = $constants;
+                }
+
+                if ($properties = $refl->getProperties()) {
+                    $info['properties'] = [];
+                    foreach ($refl->getProperties() as $property) {
+                        $property->setAccessible(true);
+                        $info['properties'][$property->name] = inspect($property->getValue($obj), $depth, $mem);
+                        $property->setAccessible(false);
+                    }
+                }
+
+                if ($methods = $refl->getMethods()) {
+                    $info['methods'] = [];
+                    foreach ($refl->getMethods() as $method) {
+                        $info['methods'][] = $method->name;
+                    }
+                }
+            }
+        } else {
+            if (!$info['recursion']) {
+                $info['properties'] = [];
+                foreach (get_object_vars($obj) as $k => $v) {
+                    $info['properties'][$k] = inspect($v, $depth, $mem);
+                }
+            }
+        }
+
+    } elseif (is_array($obj)) {
+        $info['type'] = 'array';
+        $info['properties'] = [];
+        foreach ($obj as $k => $v) {
+            $info['properties'][$k] = inspect($v, $depth, $mem);
+        }
+    }
+
+    elseif (null === $obj) {
+        $info['type'] = 'null';
+    }
+
+    elseif (false === $obj || true === $obj) {
+        $info['type'] = 'boolean';
+        $info['data'] = $obj ? 'TRUE' : 'FALSE';
+    }
+
+    elseif (is_int($obj)) {
+        $info['type'] = 'int';
+        $info['data'] = $obj;
+    }
+
+    elseif (is_string($obj)) {
+        $info['type'] = 'string';
+        $info['data'] = $obj;
+    }
+
+    return $info;
+}
+
 /**
  * Dumps any object to a readable string
  *
@@ -19,71 +124,146 @@ function dump($obj, $func = "print_r")
         $str = print_r($str, true);
 
     } elseif (is_array($str) or is_object($str)) {
+
         // Arrays and objects
         switch ($func) {
-        case "print_r":
-            $str = print_r($str, true);
-            break;
+            case "print_r":
+                $str = print_r($str, true);
+                break;
 
-        case "json_encode":
-            $str = jsonFormat(json_encode($str));
-            break;
+            case "json_encode":
+                $str = jsonFormat(json_encode($str));
+                break;
         }
     }
 
     return $str ? $str : "(empty)";
 }
 
-// Debugging values
-function d()
+function inspect_html_render($varName, $info)
 {
     $buf = [];
 
-    foreach (func_get_args() as $arg) {
-        $str = print_r($arg, true);
-        $color = null;
+    switch ($info['type']) {
+        
+        case 'object':
+            $buf[] = '<details style="padding: 0 13px;">';
+            $buf[] = '<summary style="outline: none; cursor: pointer;">';
+            $buf[] = '<span class="type" style="color: #999;">' . ($info['isClass'] ? 'class' : 'object') . '</span> ';
+            $buf[] = ($varName !== null ? '' . $varName . ' = ' : '') . $info['name'] . '</summary>';
 
-        if (is_numeric($arg) && $arg !== true) {
-            $color = '#00f';
-        } else if (is_string($arg)) {
-            $color = '#f00';
-        } else if (is_object($arg) || is_array($arg)) {
-            $color = '#333';
-        }
-
-        if (true === $arg) {
-            $buf[] = 'TRUE';
-        } elseif (false === $arg) {
-            $buf[] = 'FALSE';
-        } else {
-            if ($str) {
-                $str = str_replace("\n *RECURSION*", " [R]", $str);
-                $str = str_replace('    [', '    "', $str);
-                $str = str_replace("] => \n", "] => NULL\n", $str);
-                $str = str_replace(':protected] => ', '] => ', $str);
-                $str = str_replace('] => ', '": ', $str);
-                $str = str_replace('    (', '    {', $str);
-                $str = str_replace('    )', '    }', $str);
-                $str = str_replace("\n(", "\n{", $str);
-                $str = str_replace("\n)", "\n}", $str);
-                $str = str_replace('    ', '  ', $str);
-                
-                if ($color) {
-                    $str = '<span style="color: '.$color.';">'.$str.'</span>';
-                }
-                // $buf[] = str_wrap($str, 160);
-                $buf[] = $str;
-            } elseif ('0' === $str || 0 === $str) {
-                $buf[] = '<span style="color: #00f;">0</span>';
+            if ($info['recursion']) {
+                $buf[] = '<span style="display: block; padding: 0 13px;">(recursion)</span>';
             } else {
-                $buf[] = '<span style="color: #999;">NULL</span>';
+
+                if ($info['methods']) {
+
+                    // methods
+                    $buf[] = '<details style="margin-left: 10px;">';
+                    $buf[] = '<summary style="outline: none; cursor: pointer;">methods</summary>';
+                    $buf[] = '<ul style="list-style-type: none; padding: 0 0 0 13px; margin: 0">';
+                    foreach ($info['methods'] as $name) {
+                        $buf[] = '<li style="color: #999;">' . $name . '()</li>';
+                    }
+                    $buf[] = '</ul>';
+                    $buf[] = '</details>';
+                }
+
+                if ($info['isClass']) {
+                    $buf[] = '<details style="margin-left: 10px;">';
+                    $buf[] = '<summary style="outline: none; cursor: pointer;">properties</summary>';
+                }
+
+                // properties
+                if (isset($info['properties'])) {
+
+                    foreach ($info['properties'] as $k => $v) {
+                        $buf[] = inspect_html_render($k, $v);
+                    }
+
+                }
+
+                if ($info['isClass']) {
+                    $buf[] = '</details>';
+                }
             }
-        }
+
+            $buf[] = '</details>';
+            break;
+        
+        case 'array':
+            $buf[] = '<details style="padding: 0 13px;">';
+            $buf[] = '<summary style="outline: none; cursor: pointer;">';
+            $buf[] = '<span class="type" style="color: #999;">' . $info['type'] . '</span>';
+            $buf[] = ($varName ? ' ' . $varName : '');
+            $buf[] = '</summary>';
+
+            foreach ($info['properties'] as $k => $v) {
+                // echo '<div>' . $k . '</div>';
+                $buf[] = inspect_html_render($k, $v);
+            }
+
+            if ($info['isClass']) {
+                $buf[] = '</details>';
+            }
+
+            $buf[] = '</details>';
+            break;
+        
+        case 'string':
+            $buf[] = '<div style="padding: 0 13px 0 26px;">';
+            $buf[] = '<span class="type" style="color: #999;">' . $info['type'] . '</span>';
+            $buf[] = '' . ($varName !== null ? ' '.$varName . '' : '') . ' <span class="string" style="color: #f00;">"' . $info['data'] . '"</span>';
+            $buf[] = '</div>';
+            break;
+
+        case 'int':
+            $buf[] = '<div style="padding: 0 13px 0 26px;">';
+            $buf[] = '<span class="type" style="color: #999;">' . $info['type'] . '</span>';
+            $buf[] = '' . ($varName !== null ? ' '.$varName . '' : '') . ' <span class="string" style="color: #00f;">' . $info['data'] . '</span>';
+            $buf[] = '</div>';
+            break;
+
+        case 'boolean':
+            $buf[] = '<div style="padding: 0 13px 0 26px;">';
+            // $buf[] = '<span class="type" style="color: #999;">' . $info['type'] . '</span>';
+            $buf[] = '' . ($varName !== null ? ' '.$varName . '' : '') . ' <span class="string" style="color: ' . ($info['data'] === 'TRUE' ? '#0c0' : '#c00' ) . ';">' . $info['data'] . '</span>';
+            $buf[] = '</div>';
+            break;
+
+        case 'null':
+            $buf[] = '<div style="padding: 0 13px 0 26px;">';
+            // $buf[] = '<span class="type" style="color: #999;">' . $info['type'] . '</span>';
+            $buf[] = '' . ($varName !== null ? ' '.$varName . '' : '') . ' <span class="string" style="color: #ccc;">NULL</span>';
+            $buf[] = '</div>';
+            break;
+
+        default:
+            # code...
+            break;
     }
 
-    $output = '<pre style="font-family: menlo; font-size: 13px; line-height: 1.5; background: #eee; margin: 0 0 .25em 0; padding: 1em;">';
-    $output .= implode("\n", $buf);
-    $output .= '</pre>';
+    return implode('', $buf);
+}
 
-    echo $output;
+function inspect_html($name, $obj, $maxDepth = 30)
+{
+    $buf[] = inspect_html_render($name, inspect($obj, $maxDepth));
+
+    return implode('', $buf);
+}
+
+// function for debugging data structures
+function d()
+{
+    $buf = '<div style="font-family: \'Menlo\', monospace; font-size: 13px; line-height: 18px; padding: 10px 0; background: #eee;">';
+
+    foreach (func_get_args() as $arg) {
+        // echo '+';
+        $buf .= inspect_html(null, $arg);
+    }
+
+    $buf .= '</div>';
+
+    echo $buf;
 }
