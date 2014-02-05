@@ -256,14 +256,14 @@ function inspect_html($name, $obj, $maxDepth = 30)
 // function for debugging data structures
 function d()
 {
-    $buf = '<div style="font-family: \'Menlo\', monospace; font-size: 13px; line-height: 18px; padding: 10px 0; background: #eee;">';
+    $buf = '<div style="font-weight: bold; position: relative; z-index: 1; font-family: \'Menlo\', monospace; font-size: 13px; line-height: 18px; padding: 10px 0; background: rgba(240, 240, 240, .9);">';
 
     foreach (func_get_args() as $arg) {
         // echo '+';
         $buf .= inspect_html(null, $arg);
     }
 
-    $buf .= '</div>';
+    $buf .= '<a href="#" style="color: #eee; text-decoration: none; position: absolute; right: 8px; top: 8px; width: 18px; text-align: center; padding: 2px; background: #ccc; font-size: 15px; border-radius: 14px;" onclick="javascript:this.parentNode.parentNode.removeChild(this.parentNode);return false;">&times</a></div>';
 
     echo $buf;
 }
