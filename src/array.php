@@ -22,6 +22,11 @@ function array_insert_at_index($target, $index, $insertedValue)
     return $result;
 }
 
+function item($array, $key, $default = null)
+{
+    return isset($array[$key]) ? $array[$key] : $default;
+}
+
 /**
  * Returns the last item of an array without modifying the array
  *
