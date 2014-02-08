@@ -18,9 +18,9 @@ class PathArray implements \ArrayAccess
         if ($property) {
             $result = array_dot_get($this->data, $property);
 
-            return ($result)
-                ? $result
-                : $default;
+            return (null === $result)
+                ? $default
+                : $result;
         }
 
         return $this->data;
