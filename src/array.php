@@ -2,7 +2,7 @@
 
 /**
  * Inserts a value at a specific index 
- * (an alternative to `array_splice`, but behaves a little differently).
+ * (an alternative to `array_splice`, but behaves differently).
  *
  * @param array &$array [description]
  *
@@ -41,11 +41,6 @@ function array_first(array $array)
     }
 
     return null;
-  // $value = end($array);
-
-  // reset($array);
-
-  // return $value;
 }
 
 /**
@@ -67,17 +62,17 @@ function array_peek(array $array)
 /**
  * Recursively implode an array
  *
- * @param string $glue  [description]
- * @param array  $array [description]
+ * @param string $delim The array item delimiter
+ * @param array  $array The array
  *
- * @return [type]        [description]
+ * @return string The imploded string
  */
-function implode_recursive($glue, $array)
+function implode_recursive($delim, array $array)
 {
     $str = '';
 
     foreach ($array as $value) {
-        $str .= (strlen($str) ? $glue : '') . is_array($value) ? implodeRecursive($glue, $value) : (string) $value;
+        $str .= (strlen($str) ? $delim : '') . is_array($value) ? implode_recursive($delim, $value) : (string) $value;
     }
 
     return $str;
@@ -92,9 +87,9 @@ function implode_recursive($glue, $array)
  *
  * @return void
  */
-function array_dot_set(array &$subject, $path, $value, $overwrite = false)
+function array_delim_set(array &$subject, $path, $value, $delim, $overwrite = false)
 {
-    $keys = is_numeric($path) ? [$path] : explode('.', $path);
+    $keys = is_numeric($path) ? [$path] : explode($delim, $path);
 
     while (1 < count($keys) && $key = array_shift($keys)) {
         if (!isset($subject[$key])) {
@@ -108,18 +103,13 @@ function array_dot_set(array &$subject, $path, $value, $overwrite = false)
 
     $key = array_shift($keys);
 
-    // d($key);
-    // d($value);
-
     if (!$overwrite && is_array($value)) { // merge
         if (!isset($subject[$key]) || !is_array($subject[$key])) {
             $subject[$key] = [];
         }
 
-        array_dot_merge($subject[$key], $value);
+        array_delim_merge($subject[$key], $value);
     } else { // overwrite
-        // d($key);
-        // d($subject);
         $subject[$key] = $value;
     }
 }
@@ -132,9 +122,9 @@ function array_dot_set(array &$subject, $path, $value, $overwrite = false)
  *
  * @return [type]        [description]
  */
-function array_dot_get($subject, $path)
+function array_delim_get($subject, $path, $delim)
 {
-    $keys = explode(".", $path);
+    $keys = explode($delim, $path);
 
     while ((1 < count($keys)) && ($key = array_shift($keys))) {
 
@@ -142,14 +132,8 @@ function array_dot_get($subject, $path)
             if ((isset($subject[$key])) && (is_array($subject[$key]))) {
                 $subject = &$subject[$key];
             }
-
-            // echo $key;
-            // exit;
             if ((isset($subject[$key])) && (is_object($subject[$key]))) {
                 $subject = $subject[$key];
-                // echo "obj";
-                // exit;
-                // $subject = &$subject[$key];
             }
         }
 
@@ -157,18 +141,10 @@ function array_dot_get($subject, $path)
             if ((isset($subject->$key)) && (is_array($subject->$key))) {
                 $subject = &$subject->$key;
             }
-
-            // echo $key;
-            // exit;
             if ((isset($subject->$key)) && (is_object($subject->$key))) {
                 $subject = $subject[$key];
-                // echo "obj";
-                // exit;
-                // $subject = &$subject[$key];
             }
         }
-
-        
     }
 
     $key = array_shift($keys);
@@ -184,39 +160,26 @@ function array_dot_get($subject, $path)
 }
 
 
-function array_dot_isset(array $subject, $path)
+function array_delim_isset(array $subject, $path, $delim)
 {
-    $keys = explode(".", $path);
+    $keys = explode($delim, $path);
 
-    while ((1 < count($keys)) && ($key = array_shift($keys))) {
+    while (1 < count($keys)) {
+        $key = array_shift($keys);
 
         if (is_array($subject)) {
             if ((isset($subject[$key])) && (is_array($subject[$key]))) {
                 $subject = &$subject[$key];
             }
-
-            // echo $key;
-            // exit;
             if ((isset($subject[$key])) && (is_object($subject[$key]))) {
                 $subject = $subject[$key];
-                // echo "obj";
-                // exit;
-                // $subject = &$subject[$key];
             }
-        }
-
-        elseif (is_object($subject)) {
+        } elseif (is_object($subject)) {
             if ((isset($subject->$key)) && (is_array($subject->$key))) {
                 $subject = &$subject->$key;
             }
-
-            // echo $key;
-            // exit;
             if ((isset($subject->$key)) && (is_object($subject->$key))) {
                 $subject = $subject[$key];
-                // echo "obj";
-                // exit;
-                // $subject = &$subject[$key];
             }
         }
     }
@@ -233,9 +196,9 @@ function array_dot_isset(array $subject, $path)
         : false;
 }
 
-function array_dot_unset(array &$subject, $path)
+function array_delim_unset(array &$subject, $path)
 {
-    $keys = explode(".", $path);
+    $keys = explode($delim, $path);
 
     while ((1 < count($keys)) && ($key = array_shift($keys))) {
 
@@ -244,13 +207,8 @@ function array_dot_unset(array &$subject, $path)
                 $subject = &$subject[$key];
             }
 
-            // echo $key;
-            // exit;
             if ((isset($subject[$key])) && (is_object($subject[$key]))) {
                 $subject = $subject[$key];
-                // echo "obj";
-                // exit;
-                // $subject = &$subject[$key];
             }
         }
 
@@ -259,13 +217,8 @@ function array_dot_unset(array &$subject, $path)
                 $subject = &$subject->$key;
             }
 
-            // echo $key;
-            // exit;
             if ((isset($subject->$key)) && (is_object($subject->$key))) {
                 $subject = $subject[$key];
-                // echo "obj";
-                // exit;
-                // $subject = &$subject[$key];
             }
         }
     }
@@ -284,17 +237,17 @@ function array_dot_unset(array &$subject, $path)
 }
 
 /**
- * Merges two arrays containing dot-separated paths
+ * Merges two arrays by delimiter-separated paths
  *
  * @param array &$target [description]
  * @param array $source  [description]
  *
  * @return [type]         [description]
  */
-function array_dot_merge(array $target, array $source, $overwrite = true)
+function array_delim_merge(array $target, array $source, $delim, $overwrite = true)
 {
-    $target = array_dot_expand($target);
-    $expanded = array_dot_expand($source);
+    $target = array_delim_expand($target, $delim);
+    $expanded = array_delim_expand($source, $delim);
 
     foreach ($expanded as $key => $value) {
         if (is_numeric($key)) {
@@ -304,7 +257,7 @@ function array_dot_merge(array $target, array $source, $overwrite = true)
             if (is_array($value)) {
                 if (isset($target[$key])) {
                     if (is_array($target[$key])) {
-                        $target[$key] = array_dot_merge($target[$key], $value);
+                        $target[$key] = array_delim_merge($target[$key], $value, $delim);
                     } else {
                         $target[$key] = $value;
                     }
@@ -321,7 +274,7 @@ function array_dot_merge(array $target, array $source, $overwrite = true)
     return $target;
 }
 
-function array_dot_expand($array, $overwrite = true)
+function array_delim_expand($array, $delim, $overwrite = true)
 {
     $result = [];
 
@@ -329,31 +282,15 @@ function array_dot_expand($array, $overwrite = true)
         if (is_numeric($path)) {
             array_push($result, $value);
         } else {
-            $pathParts = explode('.', $path);
+            $pathParts = explode($delim, $path);
             $key = array_shift($pathParts);
 
             if (count($pathParts)) {
                 if (isset($result[$key])) {
                     if (is_array($result[$key])) {
-
-                        // $result[$key] = array_dot_merge(
-                        //     $result[$key], 
-                        //     array_dot_expand([implode('.', $pathParts) => $value])
-                        // );
                         $a1 = $result[$key];
-                        // echo $key;
-                        $a2 = array_dot_expand([implode('.', $pathParts) => $value]);
-
-                        $result[$key] = array_dot_merge($a1, $a2);
-                        // // d($value);
-                        // // d(array_dot_expand([implode('.', $pathParts) => $value]));
-                        // exit;
-
-                        // // TODO: use array_dot_merge here
-                        // $result[$key] = array_merge(
-                        //     $result[$key], 
-                        //     array_dot_expand([implode('.', $pathParts) => $value])
-                        // );
+                        $a2 = array_delim_expand([implode($delim, $pathParts) => $value], $delim);
+                        $result[$key] = array_delim_merge($a1, $a2, $delim);
                     } else {
                         if ($overwrite) {
                             $result[$key] = $value;
@@ -362,12 +299,12 @@ function array_dot_expand($array, $overwrite = true)
                         }
                     }
                 } else {
-                    $result[$key] = array_dot_expand([implode('.', $pathParts) => $value]);
+                    $result[$key] = array_delim_expand([implode($delim, $pathParts) => $value], $delim);
                 }
             } else {
                 if (isset($result[$key])) {
                     if (is_array($result[$key])) {
-                        $result[$key] = array_merge($result[$key], array_dot_expand($value));
+                        $result[$key] = array_merge($result[$key], array_delim_expand($value, $delim));
                     } else {
                         throw new Exception('Could not overwrite: '. $key);
                     }
@@ -381,16 +318,16 @@ function array_dot_expand($array, $overwrite = true)
     return $result;
 }
 
-function array_dot_insert_before_path(array $subject, $beforePath, $path, $value)
+function array_delim_insert_before_path(array $subject, $beforePath, $path, $value, $delim)
 {
-    $parts = explode('.', $beforePath);
+    $parts = explode($delim, $beforePath);
     $parentPath = null;
     $container = $subject;
 
     if (1 < count($parts)) {
         $beforeKey = array_pop($parts);
-        $parentPath = implode('.', $parts);
-        $container = array_dot_get($subject, $parentPath);
+        $parentPath = implode($delim, $parts);
+        $container = array_delim_get($subject, $parentPath, $delim);
     } else {
         $beforeKey = $beforePath;
     }
@@ -400,16 +337,15 @@ function array_dot_insert_before_path(array $subject, $beforePath, $path, $value
 
         foreach ($container as $k => $v) {
             if ($beforeKey === $k) {
-                array_dot_set($newContainer, $path, $value);
+                array_delim_set($newContainer, $path, $value, $delim);
             }
 
             $newContainer[$k] = $v;
         }
     }
 
-    // replace container
     if ($parentPath) {
-        array_dot_set($subject, $parentPath, $newContainer, true);
+        array_delim_set($subject, $parentPath, $newContainer, $delim, true);
     } else {
         $subject = $newContainer;
     }
@@ -418,11 +354,11 @@ function array_dot_insert_before_path(array $subject, $beforePath, $path, $value
 }
 
 /**
- * [is_assoc_array description]
+ * Test if a given array is associative
  *
- * @param array $array [description]
+ * @param array $array The array to test
  *
- * @return [type]        [description]
+ * @return bool TRUE if associative, and FALSE if not.
  */
 function is_assoc_array(array $array)
 {
@@ -435,7 +371,7 @@ function is_assoc_array(array $array)
  * @param mixed  $array    The array to sort
  * @param string $property The property to use for object sorting
  *
- * @return Boolean Returns TRUE on success or FALSE on failure.
+ * @return bool Returns TRUE on success or FALSE on failure.
  */
 function sort_by_property(array &$array, $propertyKey, $ascending = true, $caseInsensitive = false)
 {
