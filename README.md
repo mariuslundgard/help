@@ -3,15 +3,19 @@ php-util
 
 Utility functions and classes for PHP.
 
-Util\Dictionary
+Dictionary
 ---------------
 
 Usage example:
 
 ```php
-use Util;
+<?php
 
-$dict = new Dict([
+require 'vendor/autoload.php';
+
+use Util\Dictionary;
+
+$dict = new Dictionary([
 	'path.to.item'    => 123,
 	'path.to.another' => 124,
 ]);
