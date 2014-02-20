@@ -6,8 +6,7 @@
     "authors": [
         {
             "name": "Marius Lundgård",
-            "email": "studio@mariuslundgard.com",
-            "webpage": "http://mariuslundgard.com/"
+            "email": "studio@mariuslundgard.com"
         }
     ],
     "minimum-stability": "dev",
