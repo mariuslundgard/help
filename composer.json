@@ -1,20 +1,16 @@
 {
-    "name": "mariuslundgard/help",
-    "description": "PHP helper library.",
-    "keywords": ["helpers", "php"],
+    "name": "mariuslundgard/php-util",
+    "description": "PHP utilities library.",
+    "keywords": ["php", "utilities"],
     "license": "MIT",
     "authors": [
         {
             "name": "Marius Lundgård",
-            "email": "studio@mariuslundgard.com"
+            "email": "studio@mariuslundgard.com",
+            "webpage": "http://mariuslundgard.com/"
         }
     ],
-    "require": {
-        "php": ">=5.3.0"
-    },
-    "require-dev": {
-        "phpunit/phpunit": "3.7.*"
-    },
+    "minimum-stability": "dev",
     "autoload": {
         "files": [
             "src/array.php",
@@ -23,8 +19,13 @@
             "src/time.php"
         ],
         "psr-0": {
-            "Help": "src/"
+            "Util": "src/"
         }
     },
-    "minimum-stability": "dev"
+    "require": {
+        "php": ">=5.3.13"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "4.0.*"
+    }
 }
