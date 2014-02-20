@@ -410,3 +410,85 @@ function str_func_split($str, $delim, $func)
 
     return $ret;
 }
+
+function str_diff($a, $b, $lineJunkCallback = null, $charJunkCallback = null)
+{
+    // Compare `a` and `b` (lists of strings); return a `Differ`-style delta.
+
+    // Optional keyword parameters `linejunk` and `charjunk` are for filter
+    // functions (or None):
+
+    // - linejunk: A function that should accept a single string argument, and
+    //   return true iff the string is junk. The default is module-level function
+    //   IS_LINE_JUNK, which filters out lines without visible characters, except
+    //   for at most one splat ('#').
+
+    // - charjunk: A function that should accept a string of length 1. The
+    //   default is module-level function IS_CHARACTER_JUNK, which filters out
+    //   whitespace characters (a blank or tab; note: bad idea to include newline
+    //   in this!).
+
+    // Tools/scripts/ndiff.py is a command-line front-end to this function.
+
+    // Example:
+
+    // >>> diff = ndiff('one\ntwo\nthree\n'.splitlines(1),
+    // ...              'ore\ntree\nemu\n'.splitlines(1))
+    // >>> print ''.join(diff),
+    // - one
+    // ?  ^
+    // + ore
+    // ?  ^
+    // - two
+    // - three
+    // ?  -
+    // + tree
+    // + emu
+
+    $lineJunkCallback = $lineJunkCallback ? $lineJunkCallback : function ($line, $pat = '/\s*#?\s*$/')
+    {
+        return ! preg_match($pat, $line);
+    };
+
+    $charJunkCallback = $charJunkCallback ? $charJunkCallback : function ($char, $ws = [' ', "\t"])
+    {
+    // r"""
+    // Return 1 for ignorable character: iff `ch` is a space or tab.
+
+    // Examples:
+
+    // >>> IS_CHARACTER_JUNK(' ')
+    // 1
+    // >>> IS_CHARACTER_JUNK('\t')
+    // 1
+    // >>> IS_CHARACTER_JUNK('\n')
+    // 0
+    // >>> IS_CHARACTER_JUNK('x')
+    // 0
+    // """
+
+        return in_array($char, $ws);
+    };
+
+    return (new Help\Differ($lineJunkCallback, $charJunkCallback))->compare($a, $b);
+}
+
+// function str_compute_delta($a, $b)
+// {
+//     //
+// }
+
+function str_delta_encode($a, $b)
+{
+    $ret = [];
+
+    $lineJunkCallback = function ($line, $pat = '/\s*#?\s*$/') {
+        return ! preg_match($pat, $line);
+    };
+
+    $charJunkCallback = function ($char, $ws = [' ', "\t"]) {
+        return in_array($char, $ws);
+    };
+
+    return (new Help\Differ($lineJunkCallback, $charJunkCallback))->encode($a, $b);
+}
