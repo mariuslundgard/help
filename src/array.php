@@ -196,7 +196,7 @@ function array_delim_isset(array $subject, $path, $delim)
         : false;
 }
 
-function array_delim_unset(array &$subject, $path)
+function array_delim_unset(array &$subject, $path, $delim)
 {
     $keys = explode($delim, $path);
 
