@@ -1,6 +1,6 @@
 <?php
 
-namespace Help;
+namespace Util;
 
 use ArrayAccess;
 
