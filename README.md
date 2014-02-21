@@ -28,6 +28,7 @@ echo $dict['path.to.item'];     // -> 123
 Using a Dictionary object for filesystem representation.
 
 ```php
+use Util\Dictionary;
 
 $rootDir = dirname(__DIR__);
 
@@ -67,10 +68,6 @@ echo '</pre>';
 Using a Dictionary object for application configuration.
 
 ```php
-<?php
-
-require __DIR__.'/../vendor/autoload.php';
-
 use Util\Dictionary;
 
 class App
@@ -100,7 +97,7 @@ $app = new App(__DIR__, [
     'db.pass' => 'test',
 ]);
 
-echo json_encode($app->getConfig('db')) . '<br>'; // { "user": "root", "pass": "test" }
 echo $app->getConfig('db.user');                  // root
+echo json_encode($app->getConfig('db')) . '<br>'; // { "user": "root", "pass": "test" }
 
 ```
