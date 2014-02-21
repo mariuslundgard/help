@@ -20,7 +20,7 @@ $dict = new Dictionary([
 	'path.to.another' => 124,
 ]);
 
-echo json_encode($dict->get()); // -> { "path": { "to": { "item": 123, "another": "124 "}}}
+echo json_encode($dict->get()); // -> { "path": { "to": { "item": 123, "another": "124 " }}}
 echo $dict['path.to.item'];     // -> 123
 
 ```
@@ -61,5 +61,46 @@ echo '</pre>';
 //         }
 //     },
 //     ...
+
 ```
+
+Using a Dictionary object for application configuration.
+
+```php
+<?php
+
+require __DIR__.'/../vendor/autoload.php';
+
+use Util\Dictionary;
+
+class App
+{
+    protected $path;
+    protected $config;
+
+    public function __construct($path, array $config)
+    {
+        $this->path = $path;
+        $this->config = new Dictionary($config);
+    }
+
+    public function getPath()
+    {
+        return $this->path;
+    }
+
+    public function getConfig($key = null, $default = null)
+    {
+        return $this->config->get($key, $default);
+    }
+}
+
+$app = new App(__DIR__, [
+    'db.user' => 'root',
+    'db.pass' => 'test',
+]);
+
+echo json_encode($app->getConfig('db')) . '<br>'; // { "user": "root", "pass": "test" }
+echo $app->getConfig('db.user');                  // root
+
 ```
