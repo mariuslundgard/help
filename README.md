@@ -72,18 +72,17 @@ use Util\Dictionary;
 
 class App
 {
-    protected $path;
     protected $config;
 
-    public function __construct($path, array $config)
+    public function __construct(array $config = [])
     {
-        $this->path = $path;
         $this->config = new Dictionary($config);
     }
 
-    public function getPath()
+    public function config($key, $value = null)
     {
-        return $this->path;
+        $this->config->set($key, $value);
+        return $this;
     }
 
     public function getConfig($key = null, $default = null)
@@ -92,12 +91,13 @@ class App
     }
 }
 
-$app = new App(__DIR__, [
-    'db.user' => 'root',
-    'db.pass' => 'test',
-]);
+$app = (new App())
+    ->config([
+        'db.user' => 'root',
+        'db.pass' => 'test',
+    ]);
 
-echo $app->getConfig('db.user');                  // root
-echo json_encode($app->getConfig('db')) . '<br>'; // { "user": "root", "pass": "test" }
+echo $app->getConfig('db.user');         // root
+echo json_encode($app->getConfig('db')); // { "user": "root", "pass": "test" }
 
 ```
