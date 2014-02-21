@@ -213,7 +213,7 @@ function inspect_html_render($varName, $info)
         case 'string':
             $buf[] = '<div style="padding: 0 13px 0 26px;">';
             $buf[] = '<span class="type" style="color: #999;">' . $info['type'] . '</span>';
-            $buf[] = '' . ($varName !== null ? ' '.$varName . '' : '') . ' <span class="string" style="color: #f00;">"' . $info['data'] . '"</span>';
+            $buf[] = '' . ($varName !== null ? ' '.$varName . '' : '') . ' <span class="string" style="color: #f00;">"' . htmlspecialchars($info['data']) . '"</span>';
             $buf[] = '</div>';
             break;
 
