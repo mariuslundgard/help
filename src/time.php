@@ -20,7 +20,10 @@ function float_microtime()
  */
 function is_timestamp($timestamp)
 {
-    return (string) (int) $timestamp === $timestamp and $timestamp <= PHP_INT_MAX and $timestamp >= ~PHP_INT_MAX;
+    return ((string) (int) $timestamp === $timestamp) 
+        && ($timestamp <= PHP_INT_MAX)
+        && ($timestamp >= ~PHP_INT_MAX);
+    // return (string) (int) $timestamp === $timestamp && $timestamp <= PHP_INT_MAX && $timestamp >= ~PHP_INT_MAX;
 }
 
 function time_elapsed_string($ptime)

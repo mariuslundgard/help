@@ -3,6 +3,7 @@
 namespace Util;
 
 use ArrayAccess;
+use Exception;
 
 class Dictionary implements ArrayAccess
 {
@@ -19,10 +20,21 @@ class Dictionary implements ArrayAccess
         $this->merge($data);
     }
 
+    public function getDelimiter()
+    {
+        $delim = $this->config['delimiter'];
+
+        if ( ! $delim) {
+            throw new Exception('The delimiter cannot be empty');
+        }
+
+        return $delim;
+    }
+
     public function get($property = null, $default = null)
     {
         if ($property) {
-            $result = array_delim_get($this->data, $property, $this->config['delimiter']);
+            $result = array_delim_get($this->data, $property, $this->getDelimiter());
 
             return (null === $result)
                 ? $default
@@ -39,39 +51,41 @@ class Dictionary implements ArrayAccess
                 $this->set($k, $v);
             }
         } else {
-            array_delim_set($this->data, $key, $value, $this->config['delimiter'], true);
+            array_delim_set($this->data, $key, $value, $this->getDelimiter(), true);
         }
     }
 
     public function merge(array $data)
     {
-        $this->data = array_delim_merge($this->data, $data, $this->config['delimiter']);
+        $this->data = array_delim_merge($this->data, $data, $this->getDelimiter(), true);
     }
 
     public function setBeforePath($beforePath, $path, $value)
     {
-        $this->data = array_set_insert_before_path($this->data, $beforePath, $path, $value, $this->config['delimiter']);
+        $this->data = array_set_insert_before_path($this->data, $beforePath, $path, $value, $this->getDelimiter());
 
         return $this->data;
     }
 
     public function offsetExists($path)
     {
-        return array_delim_isset($this->data, $path, $this->config['delimiter']);
+        return array_delim_isset($this->data, $path, $this->getDelimiter());
     }
 
     public function offsetGet($path)
     {
-        return array_delim_get($this->data, $path, $this->config['delimiter']);
+        return $this->get($path);
+        // return array_delim_get($this->data, $path, $this->getDelimiter());
     }
 
     public function offsetSet($path, $value)
     {
-        return array_delim_set($this->data, $path, $value, true, $this->config['delimiter']);
+        return $this->set($path, $value);
+        // return array_delim_set($this->data, $path, $value, $this->getDelimiter(), true);
     }
 
     public function offsetUnset($path)
     {
-        return array_delim_unset($this->data, $path, $this->config['delimiter']);
+        return array_delim_unset($this->data, $path, $this->getDelimiter());
     }
 }
