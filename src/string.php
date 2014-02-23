@@ -296,6 +296,62 @@ function str_term_colored($text, $color="NORMAL", $back=1)
     }
 }
 
+function str_cli_color($str, $fgColor = null, $bgColor = null)
+{
+    $cliFgColors = [
+        'black' => '0;30',
+        'dark_gray' => '1;30',
+
+        'red' => '0;31',
+        'light_red' => '1;31',
+
+        'green' => '0;32',
+        'light_green' => '1;32',
+
+        'blue' => '0;34',
+        'light_blue' => '1;34',
+
+        'purple' => '0;35',
+        'light_purple' => '1;35',
+
+        'cyan' => '0;36',
+        'light_cyan' => '1;36',
+
+        'brown' => '0;33',
+        'yellow' => '1;33',
+
+        'light_gray' => '0;37',
+        'white' => '1;37',
+    ];
+
+    $cliBgColors = [
+        'black' => '40',
+        'red' => '41',
+        'green' => '42',
+        'yellow' => '43',
+        'blue' => '44',
+        'magenta' => '45',
+        'cyan' => '46',
+        'light_gray' => '47',
+    ];
+
+    $colorStr = '';
+
+    if (isset($cliFgColors[$fgColor])) {
+        $colorStr .= "\033[" . $cliFgColors[$fgColor] . "m";
+    }
+
+    if (isset($cliBgColors[$bgColor])) {
+        $colorStr .= "\033[" . $cliBgColors[$bgColor] . "m";
+    }
+
+    if (strlen($colorStr)) {
+        return $colorStr . $str . "\033[0m";
+    }
+
+    return $str;
+}
+
 /**
  * Converts a Unicode codepoint to sequence of UTF-8 bytes.
  *
