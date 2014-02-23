@@ -13,7 +13,6 @@
     "autoload": {
         "files": [
             "src/array.php",
-            "src/object.php",
             "src/string.php",
             "src/time.php"
         ],
