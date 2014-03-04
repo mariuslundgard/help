@@ -308,8 +308,8 @@ function str_cli_color($str, $fgColor = null, $bgColor = null)
         'green' => '0;32',
         'light_green' => '1;32',
 
-        'yellow' => '1;33',
-        // 'light_yellow' => '1;32', // ???
+        'yellow' => '0;33', // ???
+        'light_yellow' => '1;33', // ???
 
         'blue' => '0;34',
         'light_blue' => '1;34',
@@ -320,9 +320,8 @@ function str_cli_color($str, $fgColor = null, $bgColor = null)
         'cyan' => '0;36',
         'light_cyan' => '1;36',
 
-        // 'brown' => '0;33',
-        'white' => '1;37',
-        'light_gray' => '0;37',
+        'grey' => '0;37',
+        'light_grey' => '1;37',
     ];
 
     $cliBgColors = [
@@ -333,7 +332,7 @@ function str_cli_color($str, $fgColor = null, $bgColor = null)
         'blue' => '44',
         'magenta' => '45',
         'cyan' => '46',
-        'light_gray' => '47',
+        'grey' => '47',
     ];
 
     $colorStr = '';
