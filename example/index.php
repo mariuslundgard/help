@@ -12,4 +12,4 @@ $dict = new Dictionary([
     'delimiter' => '/',
 ]);
 
-d($dict['testing']);
+var_dump($dict['testing']);

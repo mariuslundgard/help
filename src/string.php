@@ -251,26 +251,26 @@ function str_json_format($json)
 }
 
 // first define colors to use
-$_colors = array(
-        "LIGHT_RED"   => "[1;31m",
-        "LIGHT_GREEN" => "[1;32m",
-        "YELLOW"      => "[1;33m",
-        "LIGHT_BLUE"  => "[1;34m",
-        "MAGENTA"     => "[1;35m",
-        "LIGHT_CYAN"  => "[1;36m",
-        "WHITE"       => "[1;37m",
-        "NORMAL"      => "[0m",
-        "BLACK"       => "[0;30m",
-        "RED"         => "[0;31m",
-        "GREEN"       => "[0;32m",
-        "BROWN"       => "[0;33m",
-        "BLUE"        => "[0;34m",
-        "CYAN"        => "[0;36m",
-        "BOLD"        => "[1m",
-        "UNDERSCORE"  => "[4m",
-        "REVERSE"     => "[7m",
+// $_colors = array(
+//         "LIGHT_RED"   => "[1;31m",
+//         "LIGHT_GREEN" => "[1;32m",
+//         "YELLOW"      => "[1;33m",
+//         "LIGHT_BLUE"  => "[1;34m",
+//         "MAGENTA"     => "[1;35m",
+//         "LIGHT_CYAN"  => "[1;36m",
+//         "WHITE"       => "[1;37m",
+//         "NORMAL"      => "[0m",
+//         "BLACK"       => "[0;30m",
+//         "RED"         => "[0;31m",
+//         "GREEN"       => "[0;32m",
+//         "BROWN"       => "[0;33m",
+//         "BLUE"        => "[0;34m",
+//         "CYAN"        => "[0;36m",
+//         "BOLD"        => "[1m",
+//         "UNDERSCORE"  => "[4m",
+//         "REVERSE"     => "[7m",
 
-);
+// );
 
 /**
  * Output colorized text to terminal run php scripts
@@ -281,20 +281,20 @@ $_colors = array(
  *
  * @return [type]         [description]
  */
-function str_term_colored($text, $color="NORMAL", $back=1)
-{
-    global $_colors;
-    $out = $_colors["$color"];
-    if ($out == "") {
-        $out = "[0m";
-    }
+// function str_term_colored($text, $color="NORMAL", $back=1)
+// {
+//     global $_colors;
+//     $out = $_colors["$color"];
+//     if ($out == "") {
+//         $out = "[0m";
+//     }
 
-    if ($back) {
-        return chr(27)."$out$text".chr(27)."[0m";
-    } else {
-        echo chr(27)."$out$text".chr(27).chr(27)."[0m";
-    }
-}
+//     if ($back) {
+//         return chr(27)."$out$text".chr(27)."[0m";
+//     } else {
+//         echo chr(27)."$out$text".chr(27).chr(27)."[0m";
+//     }
+// }
 
 function str_cli_color($str, $fgColor = null, $bgColor = null)
 {
@@ -308,20 +308,21 @@ function str_cli_color($str, $fgColor = null, $bgColor = null)
         'green' => '0;32',
         'light_green' => '1;32',
 
+        'yellow' => '1;33',
+        // 'light_yellow' => '1;32', // ???
+
         'blue' => '0;34',
         'light_blue' => '1;34',
 
-        'purple' => '0;35',
-        'light_purple' => '1;35',
+        'magenta' => '0;35',
+        'light_magenta' => '1;35',
 
         'cyan' => '0;36',
         'light_cyan' => '1;36',
 
-        'brown' => '0;33',
-        'yellow' => '1;33',
-
-        'light_gray' => '0;37',
+        // 'brown' => '0;33',
         'white' => '1;37',
+        'light_gray' => '0;37',
     ];
 
     $cliBgColors = [
