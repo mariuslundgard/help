@@ -33,6 +33,12 @@ class Dictionary implements ArrayAccess
 
     public function get($property = null, $default = null)
     {
+        if (! $default && is_array($property)) {
+            $this->data = [];
+            $this->merge($property);
+            return;
+        }
+
         if ($property) {
             $result = array_delim_get($this->data, $property, $this->getDelimiter());
 

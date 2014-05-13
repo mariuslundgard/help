@@ -83,4 +83,30 @@ class DictionaryTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals('default', $dict->get('setting', 'default'));
     }
+
+    public function testUnset()
+    {
+        $dict = new Dictionary([
+            'flag' => true,
+        ]);
+
+        unset($dict['flag']);
+
+        $this->assertFalse(isset($dict['flag']));
+    }
+
+    public function testUnsetDepth()
+    {
+        $dict = new Dictionary([
+            'flag' => [
+                'flag' => true,
+            ],
+        ]);
+
+        unset($dict['flag.flag']);
+
+        $this->assertFalse(isset($dict['flag.flag']));
+
+        print_r($dict);
+    }
 }
