@@ -1,6 +1,5 @@
 <?php
 
-
 /**
  * Insert array values
  *
@@ -14,13 +13,15 @@
  *
  * @return [type]         [description]
  */
-function str_insert($pattern, array $data)
+function str_insert($str, array $data, $delim = '.')
 {
-    $str = $pattern;
-
-    foreach ($data as $key => $value) {
-        if ((! is_array($value)) && (! is_object($value))) {
-            $str = str_replace("{:$key}", $value, $str);
+    preg_match_all('/\{\:([^\{]+)\}/', $str, $matches);
+    
+    if (count($matches[0])) {
+        foreach ($matches[1] as $index => $path) {
+            if ($val = array_delim_get($data, $path, $delim)) {
+                $str = str_replace($matches[0][$index], $val, $str);
+            }
         }
     }
 
