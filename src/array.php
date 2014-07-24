@@ -10,25 +10,36 @@
  */
 function array_insert_at_index($target, $index, $insertedValue)
 {
-    $result = [];
+    // unshift at the beginning
+    if ($index < 0) {
+        return array_merge([$insertedValue], $target);
+    }
+
+    // push at the end
+    if (count($target) - 1 <= $index) {
+        array_push($target, $insertedValue);
+        return $target;
+    }
+
+    $ret = [];
 
     foreach ($target as $key => $value) {
         if ($index === $key) {
-            $result[] = $insertedValue;
+            $ret[] = $insertedValue;
         }
-        $result[] = $value;
+        $ret[] = $value;
     }
 
-    return $result;
+    return $ret;
 }
 
-function item($array, $key, $default = null)
+function array_get($array, $key, $default = null)
 {
     return isset($array[$key]) ? $array[$key] : $default;
 }
 
 /**
- * Returns the last item of an array without modifying the array
+ * Returns the first item of an array without modifying the array
  *
  * @param array &$array The array to search
  *
@@ -37,7 +48,8 @@ function item($array, $key, $default = null)
 function array_first(array $array)
 {
     if (count($array)) {
-        return array_shift(array_slice($array, 0, 1));
+        $sliced = array_slice($array, 0, 1);
+        return array_shift($sliced);
     }
 
     return null;
@@ -67,12 +79,22 @@ function array_peek(array $array)
  *
  * @return string The imploded string
  */
-function implode_recursive($delim, array $array)
+function implode_recursive(array $array, $delim = ' ')
 {
     $str = '';
 
-    foreach ($array as $value) {
-        $str .= (strlen($str) ? $delim : '') . is_array($value) ? implode_recursive($delim, $value) : (string) $value;
+    foreach ($array as $data) {
+        if (strlen($str)) {
+            $str .= $delim;
+        }
+
+        if (is_array($data)) {
+            $str .= implode_recursive($data, $delim);
+        }
+        
+        if (is_string($data)) {
+            $str .= $data;
+        }
     }
 
     return $str;
@@ -98,7 +120,7 @@ function is_assoc_array(array $array)
  *
  * @return bool Returns TRUE on success or FALSE on failure.
  */
-function sort_by_property(array &$array, $propertyKey, $ascending = true, $caseInsensitive = false)
+function sort_by_key(array &$array, $propertyKey, $ascending = true, $caseInsensitive = false)
 {
     return usort($array, function($a, $b) use ($propertyKey, $ascending, $caseInsensitive)
     {
@@ -151,7 +173,7 @@ function sort_by_property(array &$array, $propertyKey, $ascending = true, $caseI
  *
  * @return void
  */
-function array_delim_set(&$subject, $path, $value, $delim, $overwrite = false)
+function array_delim_set(&$subject, $path, $value, $delim = '.', $overwrite = false)
 {
     $keys = is_numeric($path) ? [$path] : explode($delim, $path);
 
@@ -186,8 +208,12 @@ function array_delim_set(&$subject, $path, $value, $delim, $overwrite = false)
  *
  * @return [type]        [description]
  */
-function array_delim_get($subject, $path, $delim)
+function array_delim_get($subject, $path, $delim = '.')
 {
+    
+    // var_dump($subject);
+    // exit;
+
     $keys = explode($delim, $path);
 
     while ((1 < count($keys)) && ($key = array_shift($keys))) {
@@ -214,12 +240,6 @@ function array_delim_get($subject, $path, $delim)
     $key = array_shift($keys);
 
     if (is_array($subject) || is_a($subject, 'ArrayIterator')) {
-        // print_r($subject);
-        // exit;
-
-    // print_r($subject['testing']);
-    // print_r($key);
-    // exit;
 
         return (isset($subject[$key]))
             ? $subject[$key]
@@ -236,9 +256,41 @@ function array_delim_get($subject, $path, $delim)
 }
 
 
-function array_delim_isset($subject, $path, $delim)
+function array_delim_isset($subject, $path, $delim = '.')
 {
+
     $keys = explode($delim, $path);
+    
+    while ($key = array_shift($keys)) {
+        // var_dump('key: '.$key);
+
+        if (is_array($subject)) {
+            if (isset($subject[$key])) {
+                $subject = $subject[$key];
+            } else {
+                return false;
+            }
+
+        } elseif (is_object($subject)) {
+            // var_dump('OBJ '.$key);
+
+            if (isset($subject->$key)) {
+                $subject = $subject->$key;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
+
+    // var_dump('DONE: '.$subject);
+
+    return true;
+
+    // var_dump($subject);
+    // exit;
+    /*
 
     while (1 < count($keys)) {
         $key = array_shift($keys);
@@ -274,9 +326,11 @@ function array_delim_isset($subject, $path, $delim)
     }
 
     return false;
+    
+    */
 }
 
-function array_delim_unset(array &$subject, $path, $delim)
+function array_delim_unset(array &$subject, $path, $delim = '.')
 {
     $keys = explode($delim, $path);
 
@@ -324,7 +378,7 @@ function array_delim_unset(array &$subject, $path, $delim)
  *
  * @return [type]         [description]
  */
-function array_delim_merge(&$target, array $source, $delim, $overwrite = true)
+function array_delim_merge(&$target, array $source, $delim = '.', $overwrite = true)
 {
     array_delim_expand($target, $delim);
     array_delim_expand($source, $delim);
@@ -355,83 +409,92 @@ function array_delim_merge(&$target, array $source, $delim, $overwrite = true)
     return $target;
 }
 
-function array_delim_expand(&$array, $delim, $overwrite = true)
+function array_delim_expand(&$array, $delim = '.'/*, $overwrite = true*/)
 {
-    $result = [];
+    $ret = [];
 
+    foreach ($array as $path => $data) {
+        array_delim_set($ret, $path, $data, $delim);
+    }
+
+    /*
     foreach ($array as $path => $value) {
         if (is_numeric($path)) {
-            array_push($result, $value);
+            array_push($ret, $value);
         } else {
             $pathParts = explode($delim, $path);
             $key = array_shift($pathParts);
 
             if (count($pathParts)) {
-                if (isset($result[$key])) {
-                    if (is_array($result[$key])) {
-                        $a1 = $result[$key];
+                if (isset($ret[$key])) {
+                    if (is_array($ret[$key])) {
+                        $a1 = $ret[$key];
                         $a2 = [implode($delim, $pathParts) => $value];
                         array_delim_expand($a2, $delim);
-                        $result[$key] = array_delim_merge($a1, $a2, $delim);
+                        $ret[$key] = array_delim_merge($a1, $a2, $delim);
                     } else {
                         if ($overwrite) {
-                            $result[$key] = $value;
+                            $ret[$key] = $value;
                         } else {
                             throw new Exception('Could not overwrite: '. $key);
                         }
                     }
                 } else {
-                    $result[$key] = [implode($delim, $pathParts) => $value];
-                    array_delim_expand($result[$key], $delim);
+                    $ret[$key] = [implode($delim, $pathParts) => $value];
+                    array_delim_expand($ret[$key], $delim);
                 }
             } else {
-                if (isset($result[$key])) {
-                    if (is_array($result[$key])) {
-                        $result[$key] = array_merge($result[$key], array_delim_expand($value, $delim));
+                if (isset($ret[$key])) {
+                    if (is_array($ret[$key])) {
+                        array_delim_expand($value, $delim);
+
+                        $ret[$key] = array_merge($ret[$key], $value);
                     } else {
                         throw new Exception('Could not overwrite: '. $key);
                     }
                 } else {
-                    $result[$key] = $value;
+                    $ret[$key] = $value;
                 }
             }
         }
-    }
+    }*/
 
-    return $result;
+    // return $ret;
+    
+    $array = $ret;
 }
 
-function array_delim_insert_before_path(array $subject, $beforePath, $path, $value, $delim)
-{
-    $parts = explode($delim, $beforePath);
-    $parentPath = null;
-    $container = $subject;
-
-    if (1 < count($parts)) {
-        $beforeKey = array_pop($parts);
-        $parentPath = implode($delim, $parts);
-        $container = array_delim_get($subject, $parentPath, $delim);
-    } else {
-        $beforeKey = $beforePath;
-    }
-
-    if (is_array($container)) {
-        $newContainer = [];
-
-        foreach ($container as $k => $v) {
-            if ($beforeKey === $k) {
-                array_delim_set($newContainer, $path, $value, $delim);
-            }
-
-            $newContainer[$k] = $v;
-        }
-    }
-
-    if ($parentPath) {
-        array_delim_set($subject, $parentPath, $newContainer, $delim, true);
-    } else {
-        $subject = $newContainer;
-    }
-
-    return $subject;
-}
+// function array_delim_insert_before_path(array $subject, $beforePath, $path, $value, $delim = '')
+// {
+//     $parts = explode($delim, $beforePath);
+//     $parentPath = null;
+//     $container = $subject;
+//
+//     if (1 < count($parts)) {
+//         $beforeKey = array_pop($parts);
+//         $parentPath = implode($delim, $parts);
+//         $container = array_delim_get($subject, $parentPath, $delim);
+//     } else {
+//         $beforeKey = $beforePath;
+//     }
+//
+//     if (is_array($container)) {
+//         $newContainer = [];
+//
+//         foreach ($container as $k => $v) {
+//             if ($beforeKey === $k) {
+//                 array_delim_set($newContainer, $path, $value, $delim);
+//             }
+//
+//             $newContainer[$k] = $v;
+//         }
+//     }
+//
+//     if ($parentPath) {
+//         array_delim_set($subject, $parentPath, $newContainer, $delim, true);
+//     } else {
+//         $subject = $newContainer;
+//     }
+//
+//     return $subject;
+// }

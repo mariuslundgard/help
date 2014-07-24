@@ -2,7 +2,9 @@
 
 namespace Util;
 
-class DictionaryTest extends \PHPUnit_Framework_TestCase
+use PHPUnit_Framework_TestCase as TestCase;
+
+class DictionaryTest extends TestCase
 {
     public function testInstance()
     {
@@ -11,6 +13,7 @@ class DictionaryTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Util\Dictionary', $dict);
     }
 
+    /*
     public function testSimpleArray()
     {
         $dict = new Dictionary([
@@ -109,4 +112,6 @@ class DictionaryTest extends \PHPUnit_Framework_TestCase
 
         print_r($dict);
     }
+    
+    */
 }
