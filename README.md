@@ -2,7 +2,7 @@ php-util
 ========
 
 [![Build Status](https://travis-ci.org/mariuslundgard/php-util.svg)](https://travis-ci.org/mariuslundgard/php-util)
-[![Coverage Status](https://coveralls.io/repos/mariuslundgard/php-util/badge.png)](https://coveralls.io/r/mariuslundgard/php-util)
+[![Coverage Status](https://coveralls.io/repos/mariuslundgard/php-util/badge.png?branch=master)](https://coveralls.io/r/mariuslundgard/php-util?branch=master)
 
 [![Latest Stable Version](https://poser.pugx.org/mariuslundgard/php-util/v/stable.png)](https://packagist.org/packages/mariuslundgard/php-util)
 
