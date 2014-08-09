@@ -1,10 +1,17 @@
 php-util
 ========
 
+[![Build Status](https://travis-ci.org/mariuslundgard/php-util.svg)](https://travis-ci.org/mariuslundgard/php-util)
+[![Coverage Status](https://coveralls.io/repos/mariuslundgard/php-util/badge.png)](https://coveralls.io/r/mariuslundgard/php-util)
+
+[![Latest Stable Version](https://poser.pugx.org/mariuslundgard/php-util/v/stable.png)](https://packagist.org/packages/mariuslundgard/php-util)
+
+
 Utility functions and classes for PHP.
 
-Dictionary
----------------
+## Examples
+
+### The Util\Dictionary class
 
 Usage example:
 
@@ -70,7 +77,7 @@ Using a Dictionary object for application configuration.
 ```php
 use Util\Dictionary;
 
-class App
+class MyApplication
 {
     protected $config;
 
@@ -79,25 +86,33 @@ class App
         $this->config = new Dictionary($config);
     }
 
-    public function config($key, $value = null)
+    public function __get($property)
     {
-        $this->config->set($key, $value);
-        return $this;
+        switch ($property) {
+
+            case 'config':
+                return $this->config;
+
+            default:
+                throw new Exception('Unknown application property: '.$property);
+        }
     }
 
-    public function getConfig($key = null, $default = null)
+    public function configure(array $config)
     {
-        return $this->config->get($key, $default);
+        $this->config->merge($config);
+
+        return $this;
     }
 }
 
 $app = (new App())
-    ->config([
+    ->configure([
         'db.user' => 'root',
         'db.pass' => 'test',
     ]);
 
-echo $app->getConfig('db.user');         // root
-echo json_encode($app->getConfig('db')); // { "user": "root", "pass": "test" }
+echo $app->config['db.user'];         // root
+echo json_encode($app->config['db']); // { "user": "root", "pass": "test" }
 
 ```

@@ -4,33 +4,36 @@
  * Inserts a value at a specific index 
  * (an alternative to `array_splice`, but behaves differently).
  *
- * @param array &$array [description]
+ * @param array    &$array  Target array
+ * @param integer  $index   Index at which to insert value
+ * @param mixed    $value   Value to insert
  *
- * @return [type]        [description]
+ * @return void
  */
-function array_insert_at_index($target, $index, $insertedValue)
+function array_insert_at_index(array $target, $index, $value)
 {
-    // unshift at the beginning
-    if ($index < 0) {
-        return array_merge([$insertedValue], $target);
+    // unshift to the beginning
+    if ($index <= 0) {
+        array_unshift($target, $value);
+        return;
     }
 
-    // push at the end
+    // push to the end
     if (count($target) - 1 <= $index) {
-        array_push($target, $insertedValue);
-        return $target;
+        array_push($target, $value);
+        return;
     }
 
     $ret = [];
 
     foreach ($target as $key => $value) {
         if ($index === $key) {
-            $ret[] = $insertedValue;
+            $ret[] = $value;
         }
         $ret[] = $value;
     }
 
-    return $ret;
+    $array = $ret;
 }
 
 function array_get($array, $key, $default = null)
@@ -159,11 +162,6 @@ function sort_by_key(array &$array, $propertyKey, $ascending = true, $caseInsens
     });
 }
 
-
-
-
-
-
 /**
  * Sets a value in an array using a dot-separated path
  *
@@ -210,10 +208,6 @@ function array_delim_set(&$subject, $path, $value, $delim = '.', $overwrite = fa
  */
 function array_delim_get($subject, $path, $delim = '.')
 {
-    
-    // var_dump($subject);
-    // exit;
-
     $keys = explode($delim, $path);
 
     while ((1 < count($keys)) && ($key = array_shift($keys))) {
@@ -262,8 +256,6 @@ function array_delim_isset($subject, $path, $delim = '.')
     $keys = explode($delim, $path);
     
     while ($key = array_shift($keys)) {
-        // var_dump('key: '.$key);
-
         if (is_array($subject)) {
             if (isset($subject[$key])) {
                 $subject = $subject[$key];
@@ -272,8 +264,6 @@ function array_delim_isset($subject, $path, $delim = '.')
             }
 
         } elseif (is_object($subject)) {
-            // var_dump('OBJ '.$key);
-
             if (isset($subject->$key)) {
                 $subject = $subject->$key;
             } else {
@@ -284,50 +274,7 @@ function array_delim_isset($subject, $path, $delim = '.')
         }
     }
 
-    // var_dump('DONE: '.$subject);
-
     return true;
-
-    // var_dump($subject);
-    // exit;
-    /*
-
-    while (1 < count($keys)) {
-        $key = array_shift($keys);
-
-        if (is_array($subject) || is_a($subject, 'ArrayIterator')) {
-            if ((isset($subject[$key])) && (is_array($subject[$key]))) {
-                $subject = &$subject[$key];
-            }
-            if ((isset($subject[$key])) && (is_object($subject[$key]))) {
-                $subject = $subject[$key];
-            }
-        } elseif (is_object($subject)) {
-            if ((isset($subject->$key)) && (is_array($subject->$key))) {
-                $subject = &$subject->$key;
-            }
-            if ((isset($subject->$key)) && (is_object($subject->$key))) {
-                $subject = $subject[$key];
-            }
-        }
-    }
-
-    $key = array_shift($keys);
-
-    if (is_array($subject[$key]) || is_a($subject, 'ArrayIterator')) {
-        return (isset($subject[$key]))
-            ? true
-            : false;
-    }
-
-    if (is_object($subject)) {
-        $value = $subject->$key;
-        return $value;
-    }
-
-    return false;
-    
-    */
 }
 
 function array_delim_unset(array &$subject, $path, $delim = '.')
@@ -382,7 +329,6 @@ function array_delim_merge(&$target, array $source, $delim = '.', $overwrite = t
 {
     array_delim_expand($target, $delim);
     array_delim_expand($source, $delim);
-    // exit;
 
     foreach ($source as $key => $value) {
         if (is_numeric($key)) {
@@ -417,84 +363,5 @@ function array_delim_expand(&$array, $delim = '.'/*, $overwrite = true*/)
         array_delim_set($ret, $path, $data, $delim);
     }
 
-    /*
-    foreach ($array as $path => $value) {
-        if (is_numeric($path)) {
-            array_push($ret, $value);
-        } else {
-            $pathParts = explode($delim, $path);
-            $key = array_shift($pathParts);
-
-            if (count($pathParts)) {
-                if (isset($ret[$key])) {
-                    if (is_array($ret[$key])) {
-                        $a1 = $ret[$key];
-                        $a2 = [implode($delim, $pathParts) => $value];
-                        array_delim_expand($a2, $delim);
-                        $ret[$key] = array_delim_merge($a1, $a2, $delim);
-                    } else {
-                        if ($overwrite) {
-                            $ret[$key] = $value;
-                        } else {
-                            throw new Exception('Could not overwrite: '. $key);
-                        }
-                    }
-                } else {
-                    $ret[$key] = [implode($delim, $pathParts) => $value];
-                    array_delim_expand($ret[$key], $delim);
-                }
-            } else {
-                if (isset($ret[$key])) {
-                    if (is_array($ret[$key])) {
-                        array_delim_expand($value, $delim);
-
-                        $ret[$key] = array_merge($ret[$key], $value);
-                    } else {
-                        throw new Exception('Could not overwrite: '. $key);
-                    }
-                } else {
-                    $ret[$key] = $value;
-                }
-            }
-        }
-    }*/
-
-    // return $ret;
-    
     $array = $ret;
 }
-
-// function array_delim_insert_before_path(array $subject, $beforePath, $path, $value, $delim = '')
-// {
-//     $parts = explode($delim, $beforePath);
-//     $parentPath = null;
-//     $container = $subject;
-//
-//     if (1 < count($parts)) {
-//         $beforeKey = array_pop($parts);
-//         $parentPath = implode($delim, $parts);
-//         $container = array_delim_get($subject, $parentPath, $delim);
-//     } else {
-//         $beforeKey = $beforePath;
-//     }
-//
-//     if (is_array($container)) {
-//         $newContainer = [];
-//
-//         foreach ($container as $k => $v) {
-//             if ($beforeKey === $k) {
-//                 array_delim_set($newContainer, $path, $value, $delim);
-//             }
-//
-//             $newContainer[$k] = $v;
-//         }
-//     }
-//
-//     if ($parentPath) {
-//         array_delim_set($subject, $parentPath, $newContainer, $delim, true);
-//     } else {
-//         $subject = $newContainer;
-//     }
-//
-//     return $subject;
-// }
