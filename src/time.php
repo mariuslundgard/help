@@ -8,7 +8,8 @@
 function float_microtime()
 {
     list($usec, $sec) = explode(" ", microtime());
-    return ((float)$usec + (float)$sec);
+
+    return ((float) $usec + (float) $sec);
 }
 
 /**
@@ -20,7 +21,7 @@ function float_microtime()
  */
 function is_timestamp($timestamp)
 {
-    return ((string) (int) $timestamp === $timestamp) 
+    return ((string) (int) $timestamp === $timestamp)
         && ($timestamp <= PHP_INT_MAX)
         && ($timestamp >= ~PHP_INT_MAX);
     // return (string) (int) $timestamp === $timestamp && $timestamp <= PHP_INT_MAX && $timestamp >= ~PHP_INT_MAX;
@@ -30,8 +31,7 @@ function time_elapsed_string($ptime)
 {
     $etime = time() - $ptime;
 
-    if ($etime < 1)
-    {
+    if ($etime < 1) {
         return '0 seconds';
     }
 
@@ -43,12 +43,11 @@ function time_elapsed_string($ptime)
                 1                       =>  'second'
                 );
 
-    foreach ($a as $secs => $str)
-    {
+    foreach ($a as $secs => $str) {
         $d = $etime / $secs;
-        if ($d >= 1)
-        {
+        if ($d >= 1) {
             $r = round($d);
+
             return $r . ' ' . $str . ($r > 1 ? 's' : '') . ' ago';
         }
     }

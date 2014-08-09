@@ -24,7 +24,7 @@ class Dictionary implements ArrayAccess
     {
         $delim = $this->config['delimiter'];
 
-        if ( ! $delim) {
+        if (! $delim) {
             throw new Exception('The delimiter cannot be empty');
         }
 
@@ -36,6 +36,7 @@ class Dictionary implements ArrayAccess
         if (! $default && is_array($property)) {
             $this->data = [];
             $this->merge($property);
+
             return;
         }
 

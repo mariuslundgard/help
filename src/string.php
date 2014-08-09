@@ -16,7 +16,7 @@
 function str_insert($str, array $data, $delim = '.')
 {
     preg_match_all('/\{\:([^\{]+)\}/', $str, $matches);
-    
+
     if (count($matches[0])) {
         foreach ($matches[1] as $index => $path) {
             if ($val = array_delim_get($data, $path, $delim)) {
@@ -159,6 +159,7 @@ function str_encode($str)
     $str = mb_convert_encoding($str, 'UTF-32', 'UTF-8');
     $t = unpack("N*", $str);
     $t = array_map("str_prepend_ampersand_and_pound", $t);
+
     return implode("", $t);
 }
 
@@ -216,7 +217,7 @@ function str_json_format($json)
 
         // If this character is the end of an element,
         // output a new line and indent the next line.
-        } else if (($char == '}' || $char == ']') && $outOfQuotes) {
+        } elseif (($char == '}' || $char == ']') && $outOfQuotes) {
             $result .= $newLine;
             $pos --;
             for ($j=0; $j<$pos; $j++) {
@@ -368,7 +369,7 @@ function str_cli_color($str, $fgColor = null, $bgColor = null)
 function str_utf8_chr($code)
 {
     if (($code > 0x10FFFF || $code < 0x0 ) || ($code >= 0xD800 && $code <= 0xDFFF)) {
-        
+
         // bits are set outside the "valid" range as defined
         // by UNICODE 4.1.0
         return "\xEF\xBF\xBD";
@@ -382,10 +383,10 @@ function str_utf8_chr($code)
         $x = $code;
 
     } else {
-        
+
         // set up bits for UTF-8
         $x = ($code & 0x3F) | 0x80;
-        
+
         if ($code < 0x800) {
             $y = (($code & 0x7FF) >> 6) | 0xC0;
         } else {
@@ -402,7 +403,7 @@ function str_utf8_chr($code)
 
     // get the actual character
     $ret = '';
-    
+
     if ($w) {
         $ret .= chr($w);
     }
@@ -414,7 +415,7 @@ function str_utf8_chr($code)
     if ($y) {
         $ret .= chr($y);
     }
-    
+
     $ret .= chr($x);
 
     return $ret;
@@ -502,13 +503,11 @@ function str_diff($a, $b, $lineJunkCallback = null, $charJunkCallback = null)
     // + tree
     // + emu
 
-    $lineJunkCallback = $lineJunkCallback ? $lineJunkCallback : function ($line, $pat = '/\s*#?\s*$/')
-    {
+    $lineJunkCallback = $lineJunkCallback ? $lineJunkCallback : function ($line, $pat = '/\s*#?\s*$/') {
         return ! preg_match($pat, $line);
     };
 
-    $charJunkCallback = $charJunkCallback ? $charJunkCallback : function ($char, $ws = [' ', "\t"])
-    {
+    $charJunkCallback = $charJunkCallback ? $charJunkCallback : function ($char, $ws = [' ', "\t"]) {
     // r"""
     // Return 1 for ignorable character: iff `ch` is a space or tab.
 
@@ -523,7 +522,6 @@ function str_diff($a, $b, $lineJunkCallback = null, $charJunkCallback = null)
     // >>> IS_CHARACTER_JUNK('x')
     // 0
     // """
-
         return in_array($char, $ws);
     };
 

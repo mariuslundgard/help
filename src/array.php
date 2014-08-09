@@ -1,39 +1,40 @@
 <?php
 
 /**
- * Inserts a value at a specific index 
+ * Inserts a value at a specific index
  * (an alternative to `array_splice`, but behaves differently).
  *
- * @param array    &$array  Target array
+ * @param array    $array  Target array
  * @param integer  $index   Index at which to insert value
  * @param mixed    $value   Value to insert
  *
- * @return void
+ * @return array   Return the updated array
  */
 function array_insert_at_index(array $target, $index, $value)
 {
-    // unshift to the beginning
     if ($index <= 0) {
         array_unshift($target, $value);
-        return;
+
+        return $target;
     }
 
     // push to the end
     if (count($target) - 1 <= $index) {
         array_push($target, $value);
-        return;
+
+        return $target;
     }
 
     $ret = [];
 
-    foreach ($target as $key => $value) {
+    foreach ($target as $key => $val) {
         if ($index === $key) {
-            $ret[] = $value;
+            $ret[$key] = $value;
         }
-        $ret[] = $value;
+        $ret[] = $val;
     }
 
-    $array = $ret;
+    return $ret;
 }
 
 function array_get($array, $key, $default = null)
@@ -52,6 +53,7 @@ function array_first(array $array)
 {
     if (count($array)) {
         $sliced = array_slice($array, 0, 1);
+
         return array_shift($sliced);
     }
 
@@ -94,7 +96,7 @@ function implode_recursive(array $array, $delim = ' ')
         if (is_array($data)) {
             $str .= implode_recursive($data, $delim);
         }
-        
+
         if (is_string($data)) {
             $str .= $data;
         }
@@ -125,8 +127,7 @@ function is_assoc_array(array $array)
  */
 function sort_by_key(array &$array, $propertyKey, $ascending = true, $caseInsensitive = false)
 {
-    return usort($array, function($a, $b) use ($propertyKey, $ascending, $caseInsensitive)
-    {
+    return usort($array, function ($a, $b) use ($propertyKey, $ascending, $caseInsensitive) {
         // Check if object `a` is an object or array
         if (is_object($a)) {
             $aValue = $a->$propertyKey;
@@ -219,9 +220,7 @@ function array_delim_get($subject, $path, $delim = '.')
             if ((isset($subject[$key])) && (is_object($subject[$key]))) {
                 $subject = $subject[$key];
             }
-        }
-
-        elseif (is_object($subject)) {
+        } elseif (is_object($subject)) {
             if ((isset($subject->$key)) && (is_array($subject->$key))) {
                 $subject = &$subject->$key;
             }
@@ -234,27 +233,25 @@ function array_delim_get($subject, $path, $delim = '.')
     $key = array_shift($keys);
 
     if (is_array($subject) || is_a($subject, 'ArrayIterator')) {
-
         return (isset($subject[$key]))
             ? $subject[$key]
             : null;
     }
 
-
     if (is_object($subject)) {
         $value = $subject->$key;
+
         return $value;
     }
 
     return null;
 }
 
-
 function array_delim_isset($subject, $path, $delim = '.')
 {
 
     $keys = explode($delim, $path);
-    
+
     while ($key = array_shift($keys)) {
         if (is_array($subject)) {
             if (isset($subject[$key])) {
@@ -291,9 +288,7 @@ function array_delim_unset(array &$subject, $path, $delim = '.')
             if ((isset($subject[$key])) && (is_object($subject[$key]))) {
                 $subject = $subject[$key];
             }
-        }
-
-        elseif (is_object($subject)) {
+        } elseif (is_object($subject)) {
             if ((isset($subject->$key)) && (is_array($subject->$key))) {
                 $subject = &$subject->$key;
             }
@@ -308,11 +303,13 @@ function array_delim_unset(array &$subject, $path, $delim = '.')
 
     if (is_object($subject)) {
         unset($subject->$key);
+
         return;
     }
 
     if (isset($subject[$key])) {
         unset($subject[$key]);
+
         return;
     }
 }
@@ -334,7 +331,7 @@ function array_delim_merge(&$target, array $source, $delim = '.', $overwrite = t
         if (is_numeric($key)) {
             array_push($target, $value);
         } else {
-        
+
             if (is_array($value)) {
                 if (isset($target[$key])) {
                     if (is_array($target[$key])) {
@@ -342,7 +339,7 @@ function array_delim_merge(&$target, array $source, $delim = '.', $overwrite = t
                     } else {
                         $target[$key] = $value;
                     }
-                    
+
                 } else {
                     $target[$key] = $value;
                 }

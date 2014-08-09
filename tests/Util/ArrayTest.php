@@ -6,44 +6,44 @@ use PHPUnit_Framework_TestCase as TestCase;
 
 class ArrayTest extends TestCase
 {
-    // public function testArrayInsertAtIndex()
-    // {
-    //     $array = [
-    //         'test',
-    //         'one',
-    //         'two',
-    //     ];
+    public function testArrayInsertAtIndex()
+    {
+        $array = [
+            'test',
+            'one',
+            'two',
+        ];
 
-    //     array_insert_at_index($array, 0, 'check');
+        $array = array_insert_at_index($array, 0, 'check');
 
-    //     $this->assertEquals([
-    //         'check',
-    //         'test',
-    //         'one',
-    //         'two'
-    //     ], $array);
+        $this->assertEquals([
+            'check',
+            'test',
+            'one',
+            'two'
+        ], $array);
 
-    //     array_insert_at_index($array, 2, 'mic check');
+        $array = array_insert_at_index($array, 2, 'mic check');
 
-    //     $this->assertEquals([
-    //         'check',
-    //         'test',
-    //         'mic check',
-    //         'one',
-    //         'two'
-    //     ], $array);
+        $this->assertEquals([
+            'check',
+            'test',
+            'mic check',
+            'one',
+            'two'
+        ], $array);
 
-    //     array_insert_at_index($array, 10, 'mister');
+        $array = array_insert_at_index($array, 10, 'mister');
 
-    //     $this->assertEquals([
-    //         'check',
-    //         'test',
-    //         'mic check',
-    //         'one',
-    //         'two',
-    //         'mister'
-    //     ], $array);
-    // }
+        $this->assertEquals([
+            'check',
+            'test',
+            'mic check',
+            'one',
+            'two',
+            'mister'
+        ], $array);
+    }
     
     public function testArrayGet()
     {
@@ -180,24 +180,8 @@ class ArrayTest extends TestCase
 
         $this->assertEquals(1, $val1);
         $this->assertEquals(2, $val2);
-
-        //
-        // $this->assertEquals($array, [
-        //     'test' => [
-        //         'test' => 1,
-        //     ]
-        // ]);
-        //
-        // array_delim_set($array, 'test.test2', 3);
-        //
-        // $this->assertEquals($array, [
-        //     'test' => [
-        //         'test' => 1,
-        //         'test2' => 3,
-        //     ]
-        // ]);
     }
-    
+
     public function testArrayDelimIsset()
     {
         $array = [
@@ -255,10 +239,6 @@ class ArrayTest extends TestCase
         ];
         
         array_delim_expand($array);
-        
-        // print_r($array);
-        
-        // exit;
 
         $this->assertEquals([
             'testing' => [
@@ -274,8 +254,6 @@ class ArrayTest extends TestCase
                 ],
             ]
         ], $array);
-        
-        // exit;
     }
 
     public function testArrayDelimMerge()
