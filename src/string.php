@@ -58,7 +58,7 @@ function str_camel($str, $sep = '_')
  */
 function str_nonce($str)
 {
-    return hash("sha512", strRandom());
+    return hash("sha512", $str.strRandom());
 }
 
 /**
@@ -157,10 +157,10 @@ function str_utf8($str)
 function str_encode($str)
 {
     $str = mb_convert_encoding($str, 'UTF-32', 'UTF-8');
-    $t = unpack("N*", $str);
-    $t = array_map("str_prepend_ampersand_and_pound", $t);
+    $ret = unpack("N*", $str);
+    $ret = array_map("str_prepend_ampersand_and_pound", $ret);
 
-    return implode("", $t);
+    return implode("", $ret);
 }
 
 /**
@@ -184,9 +184,9 @@ function str_decode($str)
  *
  * @return [type]    [description]
  */
-function str_prepend_ampersand_and_pound($n)
+function str_prepend_ampersand_and_pound($str)
 {
-    return "&#$n;";
+    return "&#$str;";
 }
 
 /**
@@ -375,28 +375,28 @@ function str_utf8_chr($code)
         return "\xEF\xBF\xBD";
     }
 
-    $x = $y = $z = $w = 0;
+    $charX = $charY = $charZ = $charW = 0;
 
     if ($code < 0x80) {
 
         // regular ASCII character
-        $x = $code;
+        $charX = $code;
 
     } else {
 
         // set up bits for UTF-8
-        $x = ($code & 0x3F) | 0x80;
+        $charX = ($code & 0x3F) | 0x80;
 
         if ($code < 0x800) {
-            $y = (($code & 0x7FF) >> 6) | 0xC0;
+            $charY = (($code & 0x7FF) >> 6) | 0xC0;
         } else {
-            $y = (($code & 0xFC0) >> 6) | 0x80;
+            $charY = (($code & 0xFC0) >> 6) | 0x80;
 
             if ($code < 0x10000) {
-                $z = (($code >> 12) & 0x0F) | 0xE0;
+                $charZ = (($code >> 12) & 0x0F) | 0xE0;
             } else {
-                $z = (($code >> 12) & 0x3F) | 0x80;
-                $w = (($code >> 18) & 0x07) | 0xF0;
+                $charZ = (($code >> 12) & 0x3F) | 0x80;
+                $charW = (($code >> 18) & 0x07) | 0xF0;
             }
         }
     }
@@ -404,19 +404,19 @@ function str_utf8_chr($code)
     // get the actual character
     $ret = '';
 
-    if ($w) {
-        $ret .= chr($w);
+    if ($charW) {
+        $ret .= chr($charW);
     }
 
-    if ($z) {
-        $ret .= chr($z);
+    if ($charZ) {
+        $ret .= chr($charZ);
     }
 
-    if ($y) {
-        $ret .= chr($y);
+    if ($charY) {
+        $ret .= chr($charY);
     }
 
-    $ret .= chr($x);
+    $ret .= chr($charX);
 
     return $ret;
 }
@@ -469,7 +469,7 @@ function str_func_split($str, $delim, $func)
     return $ret;
 }
 
-function str_diff($a, $b, $lineJunkCallback = null, $charJunkCallback = null)
+function str_diff($strA, $strB, $lineJunkCallback = null, $charJunkCallback = null)
 {
     // Compare `a` and `b` (lists of strings); return a `Differ`-style delta.
 
@@ -525,7 +525,7 @@ function str_diff($a, $b, $lineJunkCallback = null, $charJunkCallback = null)
         return in_array($char, $ws);
     };
 
-    return (new Help\Differ($lineJunkCallback, $charJunkCallback))->compare($a, $b);
+    return (new Help\Differ($lineJunkCallback, $charJunkCallback))->compare($strA, $strB);
 }
 
 // function str_compute_delta($a, $b)
@@ -533,9 +533,9 @@ function str_diff($a, $b, $lineJunkCallback = null, $charJunkCallback = null)
 //     //
 // }
 
-function str_delta_encode($a, $b)
+function str_delta_encode($strA, $strB)
 {
-    $ret = [];
+    // $ret = [];
 
     $lineJunkCallback = function ($line, $pat = '/\s*#?\s*$/') {
         return ! preg_match($pat, $line);
@@ -545,5 +545,5 @@ function str_delta_encode($a, $b)
         return in_array($char, $ws);
     };
 
-    return (new Help\Differ($lineJunkCallback, $charJunkCallback))->encode($a, $b);
+    return (new Help\Differ($lineJunkCallback, $charJunkCallback))->encode($strA, $strB);
 }

@@ -41,7 +41,7 @@ class Dictionary implements ArrayAccess
         }
 
         if ($property) {
-            $result = array_delim_get($this->data, $property, $this->getDelimiter());
+            $result = delim_get($this->data, $property, $this->getDelimiter());
 
             return (null === $result)
                 ? $default
@@ -58,13 +58,13 @@ class Dictionary implements ArrayAccess
                 $this->set($k, $v);
             }
         } else {
-            array_delim_set($this->data, $key, $value, $this->getDelimiter(), true);
+            delim_set($this->data, $key, $value, $this->getDelimiter(), true);
         }
     }
 
     public function merge(array $data)
     {
-        $this->data = array_delim_merge($this->data, $data, $this->getDelimiter(), true);
+        $this->data = delim_merge($this->data, $data, $this->getDelimiter(), true);
     }
 
     public function setBeforePath($beforePath, $path, $value)
@@ -76,23 +76,23 @@ class Dictionary implements ArrayAccess
 
     public function offsetExists($path)
     {
-        return array_delim_isset($this->data, $path, $this->getDelimiter());
+        return delim_isset($this->data, $path, $this->getDelimiter());
     }
 
     public function offsetGet($path)
     {
         return $this->get($path);
-        // return array_delim_get($this->data, $path, $this->getDelimiter());
+        // return delim_get($this->data, $path, $this->getDelimiter());
     }
 
     public function offsetSet($path, $value)
     {
         return $this->set($path, $value);
-        // return array_delim_set($this->data, $path, $value, $this->getDelimiter(), true);
+        // return delim_set($this->data, $path, $value, $this->getDelimiter(), true);
     }
 
     public function offsetUnset($path)
     {
-        return array_delim_unset($this->data, $path, $this->getDelimiter());
+        return delim_unset($this->data, $path, $this->getDelimiter());
     }
 }

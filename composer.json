@@ -12,6 +12,7 @@
     "minimum-stability": "dev",
     "autoload": {
         "files": [
+            "src/common.php",
             "src/array.php",
             "src/string.php",
             "src/time.php"
