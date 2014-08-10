@@ -27,6 +27,6 @@ $dict->merge([
     'banana.tea.chai' => 'good',
 ]);
 
-print_r($dict->getArrayCopy());
+print_r($dict->get());
 
 print_r($dict['test.again']);
