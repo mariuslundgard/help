@@ -19,7 +19,7 @@ function str_insert($str, array $data, $delim = '.')
 
     if (count($matches[0])) {
         foreach ($matches[1] as $index => $path) {
-            if ($val = array_delim_get($data, $path, $delim)) {
+            if ($val = delim_get($data, $path, $delim)) {
                 $str = str_replace($matches[0][$index], $val, $str);
             }
         }
