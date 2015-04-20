@@ -526,7 +526,9 @@ function str_diff($strA, $strB, $lineJunkCallback = null, $charJunkCallback = nu
         return in_array($char, $ws);
     };
 
-    return (new Help\Differ($lineJunkCallback, $charJunkCallback))->compare($strA, $strB);
+    $differ = new Help\Differ($lineJunkCallback, $charJunkCallback);
+
+    return $differ->compare($strA, $strB);
 }
 
 function str_delta_encode($strA, $strB)
@@ -539,5 +541,7 @@ function str_delta_encode($strA, $strB)
         return in_array($char, $ws);
     };
 
-    return (new Help\Differ($lineJunkCallback, $charJunkCallback))->encode($strA, $strB);
+    $differ = new Help\Differ($lineJunkCallback, $charJunkCallback);
+
+    return $differ->encode($strA, $strB);
 }
