@@ -25,12 +25,13 @@ function array_insert_at_index(array $target, $index, $value)
         return $target;
     }
 
-    $ret = [];
+    $ret = array();
 
     foreach ($target as $key => $val) {
         if ($index === $key) {
             $ret[$key] = $value;
         }
+
         $ret[] = $val;
     }
 
@@ -134,7 +135,7 @@ function sort_by_key(array &$array, $propertyKey, $ascending = true, $caseInsens
         } elseif (is_array($objA)) {
             $aValue = $objA[$propertyKey];
         } else {
-            throw new \RuntimeException('Expected either an object or an array for sorting');
+            throw new RuntimeExceptionn('Expected either an object or an array for sorting');
         }
 
         // Check if object `objB` is an object or array
@@ -143,7 +144,7 @@ function sort_by_key(array &$array, $propertyKey, $ascending = true, $caseInsens
         } elseif (is_array($objB)) {
             $bValue = $objB[$propertyKey];
         } else {
-            throw new \RuntimeException('Expected either an object or an array for sorting');
+            throw new RuntimeExceptionn('Expected either an object or an array for sorting');
         }
 
         if ($caseInsensitive) {

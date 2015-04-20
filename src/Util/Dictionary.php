@@ -9,13 +9,13 @@ class Dictionary implements ArrayAccess
 {
     protected $data;
 
-    public function __construct(array $data = [], array $config = [])
+    public function __construct(array $data = array(), array $config = array())
     {
-        $this->data = [];
+        $this->data = array();
 
-        $this->config = $config + [
+        $this->config = $config + array(
             'delimiter' => '.',
-        ];
+        );
 
         $this->merge($data);
     }
@@ -34,7 +34,7 @@ class Dictionary implements ArrayAccess
     public function get($property = null, $default = null)
     {
         if (! $default && is_array($property)) {
-            $this->data = [];
+            $this->data = array();
             $this->merge($property);
 
             return;

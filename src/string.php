@@ -300,7 +300,7 @@ function str_json_format($json)
 
 function str_cli_color($str, $fgColor = null, $bgColor = null)
 {
-    $cliFgColors = [
+    $cliFgColors = array(
         'black' => '0;30',
         'dark_gray' => '1;30',
 
@@ -324,9 +324,9 @@ function str_cli_color($str, $fgColor = null, $bgColor = null)
 
         'grey' => '0;37',
         'light_grey' => '1;37',
-    ];
+    );
 
-    $cliBgColors = [
+    $cliBgColors = array(
         'black' => '40',
         'red' => '41',
         'green' => '42',
@@ -335,7 +335,7 @@ function str_cli_color($str, $fgColor = null, $bgColor = null)
         'magenta' => '45',
         'cyan' => '46',
         'grey' => '47',
-    ];
+    );
 
     $colorStr = '';
 
@@ -424,7 +424,8 @@ function str_utf8_chr($code)
 // Wrapping string
 function str_wrap($str, $width)
 {
-    $ret = [];
+    $ret = array();
+
     $lines = explode("\n", $str);
 
     for ($i = 0; $i < count($lines); $i++) {
@@ -463,7 +464,7 @@ function str_func_split($str, $delim, $func)
     $ret = explode($delim, $str);
 
     for ($i = 0; $i < count($ret); $i++) {
-        $ret[$i] = call_user_func_array($func, [$ret[$i]]);
+        $ret[$i] = call_user_func_array($func, array($ret[$i]));
     }
 
     return $ret;
@@ -504,10 +505,10 @@ function str_diff($strA, $strB, $lineJunkCallback = null, $charJunkCallback = nu
     // + emu
 
     $lineJunkCallback = $lineJunkCallback ? $lineJunkCallback : function ($line, $pat = '/\s*#?\s*$/') {
-        return ! preg_match($pat, $line);
+        return !preg_match($pat, $line);
     };
 
-    $charJunkCallback = $charJunkCallback ? $charJunkCallback : function ($char, $ws = [' ', "\t"]) {
+    $charJunkCallback = $charJunkCallback ? $charJunkCallback : function ($char, $ws = array(' ', "\t")) {
     // r"""
     // Return 1 for ignorable character: iff `ch` is a space or tab.
 
@@ -528,20 +529,13 @@ function str_diff($strA, $strB, $lineJunkCallback = null, $charJunkCallback = nu
     return (new Help\Differ($lineJunkCallback, $charJunkCallback))->compare($strA, $strB);
 }
 
-// function str_compute_delta($a, $b)
-// {
-//     //
-// }
-
 function str_delta_encode($strA, $strB)
 {
-    // $ret = [];
-
     $lineJunkCallback = function ($line, $pat = '/\s*#?\s*$/') {
-        return ! preg_match($pat, $line);
+        return !preg_match($pat, $line);
     };
 
-    $charJunkCallback = function ($char, $ws = [' ', "\t"]) {
+    $charJunkCallback = function ($char, $ws = array(' ', "\t")) {
         return in_array($char, $ws);
     };
 

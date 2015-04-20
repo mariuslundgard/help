@@ -68,11 +68,11 @@ function delim_get($subject, $path, $delim = '.')
  */
 function delim_set(&$subject, $path, $value, $delim = '.', $overwrite = false)
 {
-    $keys = is_numeric($path) ? [$path] : explode($delim, $path);
+    $keys = is_numeric($path) ? array($path) : explode($delim, $path);
 
     while (1 < count($keys) && $key = array_shift($keys)) {
         if (!isset($subject[$key])) {
-            $subject[$key] = [];
+            $subject[$key] = array();
         } elseif (!is_array($subject[$key])) {
             $subject[$key] = (array) $subject[$key];
         }
@@ -84,7 +84,7 @@ function delim_set(&$subject, $path, $value, $delim = '.', $overwrite = false)
 
     if (!$overwrite && is_array($value)) { // merge
         if (!isset($subject[$key]) || !is_array($subject[$key])) {
-            $subject[$key] = [];
+            $subject[$key] = array();
         }
 
         delim_merge($subject[$key], $value);
@@ -199,7 +199,7 @@ function delim_merge(&$target, array $source, $delim = '.')
 
 function delim_expand(&$array, $delim = '.'/*, $overwrite = true*/)
 {
-    $ret = [];
+    $ret = array();
 
     foreach ($array as $path => $data) {
         delim_set($ret, $path, $data, $delim);
