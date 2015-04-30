@@ -45,8 +45,6 @@ function str_camel($str, $sep = '_')
     }
 
     return $camelStr;
-
-    // return ucfirst($str);
 }
 
 /**
@@ -234,8 +232,7 @@ function str_json_format($json)
             if ($pos) {
                 $result = substr($result, 0, strlen($result)-1).' '.'{';
             }
-            // echo $result;
-            // exit;
+
             $result .= $newLine;
             if ($char == '{' || $char == '[') {
                 $pos ++;
@@ -251,52 +248,6 @@ function str_json_format($json)
 
     return $result;
 }
-
-// first define colors to use
-// $_colors = array(
-//         "LIGHT_RED"   => "[1;31m",
-//         "LIGHT_GREEN" => "[1;32m",
-//         "YELLOW"      => "[1;33m",
-//         "LIGHT_BLUE"  => "[1;34m",
-//         "MAGENTA"     => "[1;35m",
-//         "LIGHT_CYAN"  => "[1;36m",
-//         "WHITE"       => "[1;37m",
-//         "NORMAL"      => "[0m",
-//         "BLACK"       => "[0;30m",
-//         "RED"         => "[0;31m",
-//         "GREEN"       => "[0;32m",
-//         "BROWN"       => "[0;33m",
-//         "BLUE"        => "[0;34m",
-//         "CYAN"        => "[0;36m",
-//         "BOLD"        => "[1m",
-//         "UNDERSCORE"  => "[4m",
-//         "REVERSE"     => "[7m",
-
-// );
-
-/**
- * Output colorized text to terminal run php scripts
- *
- * @param [type]  $text  [description]
- * @param string  $color [description]
- * @param integer $back  [description]
- *
- * @return [type]         [description]
- */
-// function str_term_colored($text, $color="NORMAL", $back=1)
-// {
-//     global $_colors;
-//     $out = $_colors["$color"];
-//     if ($out == "") {
-//         $out = "[0m";
-//     }
-
-//     if ($back) {
-//         return chr(27)."$out$text".chr(27)."[0m";
-//     } else {
-//         echo chr(27)."$out$text".chr(27).chr(27)."[0m";
-//     }
-// }
 
 function str_cli_color($str, $fgColor = null, $bgColor = null)
 {
@@ -470,78 +421,78 @@ function str_func_split($str, $delim, $func)
     return $ret;
 }
 
-function str_diff($strA, $strB, $lineJunkCallback = null, $charJunkCallback = null)
-{
-    // Compare `a` and `b` (lists of strings); return a `Differ`-style delta.
+// function str_diff($strA, $strB, $lineJunkCallback = null, $charJunkCallback = null)
+// {
+//     // Compare `a` and `b` (lists of strings); return a `Differ`-style delta.
 
-    // Optional keyword parameters `linejunk` and `charjunk` are for filter
-    // functions (or None):
+//     // Optional keyword parameters `linejunk` and `charjunk` are for filter
+//     // functions (or None):
 
-    // - linejunk: A function that should accept a single string argument, and
-    //   return true iff the string is junk. The default is module-level function
-    //   IS_LINE_JUNK, which filters out lines without visible characters, except
-    //   for at most one splat ('#').
+//     // - linejunk: A function that should accept a single string argument, and
+//     //   return true iff the string is junk. The default is module-level function
+//     //   IS_LINE_JUNK, which filters out lines without visible characters, except
+//     //   for at most one splat ('#').
 
-    // - charjunk: A function that should accept a string of length 1. The
-    //   default is module-level function IS_CHARACTER_JUNK, which filters out
-    //   whitespace characters (a blank or tab; note: bad idea to include newline
-    //   in this!).
+//     // - charjunk: A function that should accept a string of length 1. The
+//     //   default is module-level function IS_CHARACTER_JUNK, which filters out
+//     //   whitespace characters (a blank or tab; note: bad idea to include newline
+//     //   in this!).
 
-    // Tools/scripts/ndiff.py is a command-line front-end to this function.
+//     // Tools/scripts/ndiff.py is a command-line front-end to this function.
 
-    // Example:
+//     // Example:
 
-    // >>> diff = ndiff('one\ntwo\nthree\n'.splitlines(1),
-    // ...              'ore\ntree\nemu\n'.splitlines(1))
-    // >>> print ''.join(diff),
-    // - one
-    // ?  ^
-    // + ore
-    // ?  ^
-    // - two
-    // - three
-    // ?  -
-    // + tree
-    // + emu
+//     // >>> diff = ndiff('one\ntwo\nthree\n'.splitlines(1),
+//     // ...              'ore\ntree\nemu\n'.splitlines(1))
+//     // >>> print ''.join(diff),
+//     // - one
+//     // ?  ^
+//     // + ore
+//     // ?  ^
+//     // - two
+//     // - three
+//     // ?  -
+//     // + tree
+//     // + emu
 
-    $lineJunkCallback = $lineJunkCallback ? $lineJunkCallback : function ($line, $pat = '/\s*#?\s*$/') {
-        return !preg_match($pat, $line);
-    };
+//     $lineJunkCallback = $lineJunkCallback ? $lineJunkCallback : function ($line, $pat = '/\s*#?\s*$/') {
+//         return !preg_match($pat, $line);
+//     };
 
-    $charJunkCallback = $charJunkCallback ? $charJunkCallback : function ($char, $ws = array(' ', "\t")) {
-    // r"""
-    // Return 1 for ignorable character: iff `ch` is a space or tab.
+//     $charJunkCallback = $charJunkCallback ? $charJunkCallback : function ($char, $ws = array(' ', "\t")) {
+//     // r"""
+//     // Return 1 for ignorable character: iff `ch` is a space or tab.
 
-    // Examples:
+//     // Examples:
 
-    // >>> IS_CHARACTER_JUNK(' ')
-    // 1
-    // >>> IS_CHARACTER_JUNK('\t')
-    // 1
-    // >>> IS_CHARACTER_JUNK('\n')
-    // 0
-    // >>> IS_CHARACTER_JUNK('x')
-    // 0
-    // """
-        return in_array($char, $ws);
-    };
+//     // >>> IS_CHARACTER_JUNK(' ')
+//     // 1
+//     // >>> IS_CHARACTER_JUNK('\t')
+//     // 1
+//     // >>> IS_CHARACTER_JUNK('\n')
+//     // 0
+//     // >>> IS_CHARACTER_JUNK('x')
+//     // 0
+//     // """
+//         return in_array($char, $ws);
+//     };
 
-    $differ = new Help\Differ($lineJunkCallback, $charJunkCallback);
+//     $differ = new Help\Differ($lineJunkCallback, $charJunkCallback);
 
-    return $differ->compare($strA, $strB);
-}
+//     return $differ->compare($strA, $strB);
+// }
 
-function str_delta_encode($strA, $strB)
-{
-    $lineJunkCallback = function ($line, $pat = '/\s*#?\s*$/') {
-        return !preg_match($pat, $line);
-    };
+// function str_delta_encode($strA, $strB)
+// {
+//     $lineJunkCallback = function ($line, $pat = '/\s*#?\s*$/') {
+//         return !preg_match($pat, $line);
+//     };
 
-    $charJunkCallback = function ($char, $ws = array(' ', "\t")) {
-        return in_array($char, $ws);
-    };
+//     $charJunkCallback = function ($char, $ws = array(' ', "\t")) {
+//         return in_array($char, $ws);
+//     };
 
-    $differ = new Help\Differ($lineJunkCallback, $charJunkCallback);
+//     $differ = new Help\Differ($lineJunkCallback, $charJunkCallback);
 
-    return $differ->encode($strA, $strB);
-}
+//     return $differ->encode($strA, $strB);
+// }

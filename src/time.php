@@ -24,14 +24,13 @@ function is_timestamp($timestamp)
     return ((string) (int) $timestamp === $timestamp)
         && ($timestamp <= PHP_INT_MAX)
         && ($timestamp >= ~PHP_INT_MAX);
-    // return (string) (int) $timestamp === $timestamp && $timestamp <= PHP_INT_MAX && $timestamp >= ~PHP_INT_MAX;
 }
 
-function time_elapsed_string($ptime)
+function time_elapsed_string($timestamp)
 {
-    $etime = time() - $ptime;
+    $elapsedSeconds = time() - $timestamp;
 
-    if ($etime < 1) {
+    if ($elapsedSeconds < 1) {
         return '0 seconds';
     }
 
@@ -45,7 +44,7 @@ function time_elapsed_string($ptime)
     );
 
     foreach ($spans as $secs => $str) {
-        $val = $etime / $secs;
+        $val = $elapsedSeconds / $secs;
         if ($val >= 1) {
             $rVal = round($val);
 
